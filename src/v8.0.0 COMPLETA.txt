@@ -1,0 +1,34 @@
+discografia/
+├── index.html                        ✅ Bundle 1b
+├── TESTS.html                        ✅ Bundle 3b
+├── styles.css                        ✅ Bundle 1c
+├── sw.js                             ✅ Bundle 1a
+├── package.json                      ✅ Original v7.1.1
+├── vitest.config.js                  ✅ Original v7.1.1
+├── README.md                         ✅ Bundle 1a
+├── INICIAR.bat                       ✅ Original v7.1.1
+├── INICIAR.sh                        ✅ Original v7.1.1
+│
+├── app-i18n.js                       ✅ Bundle 4a
+├── app-workspaces.js                 ✅ Bundle 4a
+├── app-tags.js                       ✅ Bundle 4b
+├── app-savedfilters.js               ✅ Bundle 4b
+├── app-commandpalette.js             ✅ Bundle 4b
+├── app-shortcuts.js                  ✅ Bundle 4b
+│
+├── app-core-0-storage.js             ✅ Bundle 2a
+├── app-core-1-base.js                ✅ Bundle 2a
+├── app-core-2-api.js                 ❌ NO TOCAR (v7.1.1 original)
+├── app-core-3-enrich.js              ✅ Bundle 2b
+├── lastfm.js                         ❌ NO TOCAR (v7.1.1 original)
+├── app-ui-1-estado.js                ✅ Bundle 2b
+├── app-ui-2-render.js                ✅ Bundle 2b
+├── app-ui-3-modal.js                 ✅ Bundle 3a
+├── app-ui-4-init.js                  ✅ Bundle 3a
+├── app-labels.js                     ✅ Original v7.5.0
+│
+├── src/
+│   └── pure.js                       ✅ Bundle 3b
+│
+└── tests/
+    └── pure.test.js                  ✅ Bundle 3b

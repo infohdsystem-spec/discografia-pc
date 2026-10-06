@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manual de uso — Discografía v8.0.0</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0e1116;--bg2:#151a22;--bg3:#1c232e;--line:#252d3a;
+    --txt:#e6ebf2;--muted:#8b97a8;--accent:#4fc3f7;--accent2:#ffca28;
+    --ok:#5ddc9a;--danger:#ff6b6b;--warn:#ffa94d;--purple:#a78bfa;
+  }
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Segoe UI',Roboto,system-ui,sans-serif;
+    background:radial-gradient(1200px 600px at 15% -10%,#1d2a3a 0%,transparent 60%),
+               radial-gradient(900px 500px at 110% 10%,#2a2136 0%,transparent 55%),
+               var(--bg);
+    color:var(--txt);line-height:1.7;font-size:16px;
+    display:grid;grid-template-columns:280px 1fr;min-height:100vh;
+  }
+
+  /* SIDEBAR */
+  aside{
+    position:sticky;top:0;height:100vh;overflow-y:auto;
+    background:rgba(21,26,34,.85);backdrop-filter:blur(10px);
+    border-right:1px solid var(--line);padding:20px 0;
+  }
+  aside::-webkit-scrollbar{width:8px}
+  aside::-webkit-scrollbar-track{background:transparent}
+  aside::-webkit-scrollbar-thumb{background:#2d3644;border-radius:4px}
+
+  .brand{
+    padding:0 20px 20px;border-bottom:1px solid var(--line);margin-bottom:16px;
+  }
+  .brand h1{font-size:1.1rem;font-weight:800;display:flex;align-items:center;gap:10px;color:var(--txt)}
+  .brand .badge{
+    font-size:.6rem;font-weight:800;background:linear-gradient(135deg,#4fc3f7,#a78bfa);
+    color:#0e1116;padding:3px 9px;border-radius:20px;margin-left:auto;
+  }
+  .brand small{display:block;font-size:.72rem;color:var(--muted);margin-top:6px;letter-spacing:.5px}
+  .brand .author{font-size:.7rem;color:var(--muted);margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+  .brand .author b{color:var(--accent)}
+
+  nav{padding:0 10px}
+  .nav-group{margin-bottom:18px}
+  .nav-group-title{
+    font-size:.62rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);
+    font-weight:800;padding:8px 12px 4px;opacity:.7;
+  }
+  nav a{
+    display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;
+    color:var(--muted);text-decoration:none;font-size:.85rem;font-weight:500;
+    transition:.15s;border-left:2px solid transparent;
+  }
+  nav a:hover{background:rgba(79,195,247,.08);color:var(--txt)}
+  nav a.active{background:linear-gradient(90deg,rgba(79,195,247,.18),transparent);color:var(--accent);border-left-color:var(--accent);font-weight:600}
+  nav a .ico{font-size:1rem;width:18px;text-align:center;flex:0 0 auto}
+
+  /* MAIN */
+  main{max-width:900px;padding:40px 48px 100px;margin:0 auto}
+
+  h1.doc-title{
+    font-size:2rem;font-weight:800;margin-bottom:8px;line-height:1.2;
+    background:linear-gradient(135deg,#4fc3f7,#a78bfa);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-clip:text;
+  }
+  .doc-sub{color:var(--muted);font-size:.95rem;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+
+  section{margin-bottom:60px;scroll-margin-top:20px}
+  section h2{
+    font-size:1.4rem;font-weight:800;margin-bottom:8px;color:var(--txt);
+    display:flex;align-items:center;gap:12px;
+  }
+  section h2 .num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:34px;height:34px;border-radius:10px;font-size:.9rem;font-weight:800;
+    background:linear-gradient(135deg,#4fc3f7,#a78bfa);color:#0e1116;flex:0 0 auto;
+  }
+  section .sec-sub{color:var(--muted);font-size:.88rem;margin-bottom:22px;padding-left:46px}
+  h3{font-size:1.05rem;font-weight:700;margin:26px 0 10px;color:var(--accent2);display:flex;align-items:center;gap:8px}
+  h4{font-size:.92rem;font-weight:700;margin:18px 0 8px;color:var(--accent)}
+  p{margin-bottom:12px;color:#cfd8e3}
+  ul,ol{margin:8px 0 16px 24px;color:#cfd8e3}
+  li{margin:6px 0}
+  strong{color:var(--txt);font-weight:600}
+  em{color:var(--accent2);font-style:normal;font-weight:600}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px dotted rgba(79,195,247,.5)}
+  a:hover{border-bottom-style:solid}
+
+  code{
+    background:rgba(79,195,247,.1);border:1px solid rgba(79,195,247,.2);
+    padding:2px 7px;border-radius:5px;font-family:ui-monospace,Menlo,Consolas,monospace;
+    font-size:.86em;color:var(--accent2);
+  }
+  kbd{
+    display:inline-block;background:linear-gradient(180deg,#1e2430,#161c25);
+    border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;
+    padding:2px 8px;font-size:.78em;font-family:ui-monospace,Menlo,Consolas,monospace;
+    color:var(--txt);font-weight:600;margin:0 2px;
+  }
+
+  /* CAJAS */
+  .box{
+    padding:14px 18px;border-radius:12px;margin:16px 0;font-size:.9rem;
+    display:flex;gap:14px;line-height:1.6;
+  }
+  .box .ico{font-size:1.5rem;line-height:1;flex:0 0 auto}
+  .box-info{background:rgba(79,195,247,.06);border-left:4px solid var(--accent)}
+  .box-ok{background:rgba(93,220,154,.06);border-left:4px solid var(--ok)}
+  .box-warn{background:rgba(255,169,77,.06);border-left:4px solid var(--warn)}
+  .box-danger{background:rgba(255,107,107,.06);border-left:4px solid var(--danger)}
+  .box-tip{background:rgba(167,139,250,.06);border-left:4px solid var(--purple)}
+
+  /* PASOS */
+  .steps{counter-reset:step;list-style:none;margin:16px 0;padding:0}
+  .steps li{
+    counter-increment:step;position:relative;padding:14px 18px 14px 60px;
+    background:rgba(255,255,255,.02);border:1px solid var(--line);
+    border-radius:10px;margin-bottom:10px;line-height:1.6;
+  }
+  .steps li::before{
+    content:counter(step);position:absolute;left:16px;top:14px;
+    width:30px;height:30px;border-radius:50%;
+    background:linear-gradient(135deg,#4fc3f7,#a78bfa);color:#0e1116;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:.9rem;
+  }
+  .steps li b{color:var(--txt)}
+  .steps li .hint{display:block;color:var(--muted);font-size:.82rem;margin-top:4px;font-style:italic}
+
+  /* TABLAS */
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.87rem;border-radius:10px;overflow:hidden}
+  th{
+    text-align:left;padding:12px 14px;background:rgba(79,195,247,.12);
+    color:var(--accent);font-size:.72rem;text-transform:uppercase;letter-spacing:1px;
+    font-weight:800;border-bottom:1px solid rgba(79,195,247,.25);
+  }
+  td{padding:11px 14px;border-bottom:1px solid rgba(37,45,58,.5);color:#cfd8e3;vertical-align:top}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+  tr:last-child td{border-bottom:none}
+  td code{font-size:.82em}
+
+  /* ATAJOS */
+  .shortcut-table td:first-child{font-family:ui-monospace,Menlo,Consolas,monospace;white-space:nowrap;color:var(--txt);font-weight:600}
+
+  /* BOTONES DE EJEMPLO */
+  .btn-demo{
+    display:inline-flex;align-items:center;gap:6px;padding:4px 10px;
+    background:rgba(79,195,247,.15);border:1px solid rgba(79,195,247,.4);
+    color:var(--accent);border-radius:7px;font-size:.82rem;font-weight:600;
+    margin:0 2px;font-family:inherit;
+  }
+  .btn-demo.primary{background:rgba(79,195,247,.25);color:#fff}
+  .btn-demo.danger{background:rgba(255,107,107,.15);border-color:rgba(255,107,107,.4);color:#ffb3b3}
+  .btn-demo.warn{background:rgba(255,169,77,.15);border-color:rgba(255,169,77,.4);color:#ffd9b3}
+  .btn-demo.ok{background:rgba(93,220,154,.15);border-color:rgba(93,220,154,.4);color:#b8f5d6}
+
+  /* BOTÓN FLOTANTE PARA IMPRIMIR */
+  .print-fab{
+    position:fixed;
+    bottom:24px;
+    right:24px;
+    z-index:100;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    padding:14px 22px;
+    background:linear-gradient(135deg,#4fc3f7,#a78bfa);
+    border:0;
+    border-radius:50px;
+    color:#0e1116;
+    font-family:inherit;
+    font-size:.92rem;
+    font-weight:800;
+    letter-spacing:.3px;
+    cursor:pointer;
+    box-shadow:0 10px 30px rgba(79,195,247,.45), 0 4px 12px rgba(0,0,0,.4);
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .print-fab:hover{
+    transform:translateY(-3px);
+    box-shadow:0 16px 40px rgba(79,195,247,.6), 0 6px 16px rgba(0,0,0,.5);
+  }
+  .print-fab:active{ transform:translateY(-1px); }
+  .print-fab .ico{ font-size:1.15rem; line-height:1; }
+  .print-fab .label{ white-space:nowrap; }
+
+  @media (max-width: 640px){
+    .print-fab{ bottom:16px; right:16px; padding:12px 16px; font-size:.82rem; }
+    .print-fab .label{ display:none; }
+  }
+
+  /* PRINT */
+  @media print{
+    body{display:block;background:#fff;color:#000;font-size:11pt}
+    aside{display:none}
+    main{max-width:100%;padding:0}
+    .print-fab{display:none !important}
+    .doc-title{-webkit-text-fill-color:#000;color:#000;background:none}
+    section{page-break-inside:avoid;margin-bottom:30px}
+    .box,.steps li{border:1px solid #ccc;background:#f9f9f9}
+    code,kbd{background:#f0f0f0;color:#000;border:1px solid #ccc}
+    table{border:1px solid #ccc}
+    th{background:#eee;color:#000}
+    a{color:#000;text-decoration:none}
+  }
+
+  /* RESPONSIVE */
+  @media (max-width:900px){
+    body{display:block}
+    aside{position:relative;height:auto;border-right:0;border-bottom:1px solid var(--line)}
+    main{padding:24px 20px 60px}
+    .doc-title{font-size:1.4rem}
+    section h2{font-size:1.1rem}
+  }
+</style>
+</head>
+<body>
+
+<aside>
+  <div class="brand">
+    <h1>💿 Manual <span class="badge">v8.0.0</span></h1>
+    <small>Guía completa paso a paso</small>
+    <div class="author">
+      <b>HDSystem IT</b><br>
+      📞 +54 9 11 4563-0851<br>
+      © 2024-2026 · Todos los derechos reservados
+    </div>
+  </div>
+
+  <nav>
+    <div class="nav-group">
+      <div class="nav-group-title">🚀 Primeros pasos</div>
+      <a href="#intro"><span class="ico">🏠</span>Introducción</a>
+      <a href="#instalar"><span class="ico">📦</span>Instalación</a>
+      <a href="#arrancar"><span class="ico">▶️</span>Cómo arrancar</a>
+      <a href="#config"><span class="ico">🔑</span>Configurar tokens</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">💿 Uso diario</div>
+      <a href="#categorias"><span class="ico">📁</span>Categorías</a>
+      <a href="#subcategorias"><span class="ico">📂</span>Subcategorías</a>
+      <a href="#agregar-cd"><span class="ico">➕</span>Agregar un CD</a>
+      <a href="#editar-cd"><span class="ico">✏️</span>Editar un CD</a>
+      <a href="#eliminar-cd"><span class="ico">🗑️</span>Eliminar un CD</a>
+      <a href="#buscar"><span class="ico">🔍</span>Buscar y filtrar</a>
+      <a href="#seleccion"><span class="ico">☑️</span>Selección múltiple</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">✨ Potencia</div>
+      <a href="#enriquecer"><span class="ico">✨</span>Enriquecer</a>
+      <a href="#tags"><span class="ico">🏷️</span>Etiquetas (tags)</a>
+      <a href="#workspaces"><span class="ico">📚</span>Multi-colección</a>
+      <a href="#duplicados"><span class="ico">🔀</span>Duplicados y merge</a>
+      <a href="#prestamos"><span class="ico">📚</span>Préstamos</a>
+      <a href="#filtros-guardados"><span class="ico">💾</span>Filtros guardados</a>
+      <a href="#command-palette"><span class="ico">⌘</span>Command palette</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">📤 Datos</div>
+      <a href="#exportar"><span class="ico">📤</span>Exportar</a>
+      <a href="#importar"><span class="ico">📥</span>Importar</a>
+      <a href="#backup"><span class="ico">💾</span>Backup automático</a>
+      <a href="#etiquetas-imprimir"><span class="ico">🖨️</span>Etiquetas imprimibles</a>
+      <a href="#pdf"><span class="ico">📄</span>PDF con portadas</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">⚙️ Sistema</div>
+      <a href="#idioma"><span class="ico">🌎</span>Cambiar idioma</a>
+      <a href="#tema"><span class="ico">🎨</span>Tema claro/oscuro</a>
+      <a href="#atajos"><span class="ico">⌨️</span>Atajos de teclado</a>
+      <a href="#dashboard"><span class="ico">📊</span>Dashboard</a>
+      <a href="#offline"><span class="ico">📲</span>Modo offline</a>
+      <a href="#actualizaciones"><span class="ico">🔄</span>Actualizaciones</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">🆘 Ayuda</div>
+      <a href="#problemas"><span class="ico">🐛</span>Problemas comunes</a>
+      <a href="#recuperar"><span class="ico">🚑</span>Recuperar datos</a>
+      <a href="#contacto"><span class="ico">📞</span>Contacto</a>
+    </div>
+  </nav>
+</aside>
+
+<main>
+
+<h1 class="doc-title">Manual de uso — Discografía v8.0.0</h1>
+<p class="doc-sub">Guía completa paso a paso · Última actualización: 2026 · <b>HDSystem IT</b></p>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="intro">
+  <h2><span class="num">0</span>Introducción</h2>
+  <p class="sec-sub">Qué es esta aplicación y qué podés hacer con ella</p>
+
+  <p><b>Discografía v8.0.0</b> es una aplicación web que corre <b>100% en tu navegador</b>. No necesita internet para funcionar (salvo para enriquecer datos), no sube tus datos a ningún servidor, y todo se guarda en tu propia computadora.</p>
+
+  <h3>🎯 ¿Qué podés hacer?</h3>
+  <ul>
+    <li>Catalogar tu colección completa de CDs con más de 30 campos por disco</li>
+    <li>Buscar automáticamente portadas, años, sellos y datos desde Discogs, MusicBrainz y Last.fm</li>
+    <li>Gestionar varias colecciones independientes (personal, vinilos, para vender, etc.)</li>
+    <li>Marcar CDs prestados con alertas de vencimiento</li>
+    <li>Detectar y fusionar duplicados</li>
+    <li>Imprimir etiquetas con código QR para pegar en las cajas</li>
+    <li>Exportar a PDF, CSV, JSON y Markdown</li>
+    <li>Funcionar <b>sin internet</b> una vez cargada</li>
+    <li>Cambiar el idioma entre Español, Inglés y Portugués</li>
+  </ul>
+
+  <div class="box box-info">
+    <div class="ico">💡</div>
+    <div><b>Sin límites de cantidad:</b> podés cargar desde 10 hasta 10.000 CDs. El sistema se adapta automáticamente para mantener la velocidad.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="instalar">
+  <h2><span class="num">1</span>Instalación</h2>
+  <p class="sec-sub">Requisitos y estructura de archivos</p>
+
+  <h3>📋 ¿Qué necesitás?</h3>
+  <table>
+    <thead><tr><th>Requisito</th><th>Detalle</th></tr></thead>
+    <tbody>
+      <tr><td><b>Navegador</b></td><td>Chrome, Edge, Firefox o Safari (versiones 2023 o posteriores)</td></tr>
+      <tr><td><b>Python o Node</b></td><td>Para servir la app. <b>Python 3</b> recomendado (viene preinstalado en Mac/Linux)</td></tr>
+      <tr><td><b>Sistema operativo</b></td><td>Windows, macOS o Linux</td></tr>
+      <tr><td><b>Espacio en disco</b></td><td>~50 MB para la app + espacio para tus datos</td></tr>
+    </tbody>
+  </table>
+
+  <h3>📂 Estructura de archivos</h3>
+  <p>Tu carpeta debe verse así:</p>
+  <pre style="background:#151a22;border:1px solid var(--line);border-radius:10px;padding:16px;overflow-x:auto;font-size:.82rem;color:#cfd8e3;font-family:ui-monospace,Consolas,monospace;line-height:1.6">
+DISCOGRAFICA v8.0.0/
+├── index.html                    ← La app
+├── MANUAL.html                   ← Este manual
+├── TESTS.html                    ← Verificar que todo anda
+├── INICIAR.bat                   ← Doble clic para arrancar (Windows)
+├── INICIAR.sh                    ← Para Mac/Linux
+├── styles.css
+├── sw.js
+├── app-*.js  (15 archivos JS)
+└── src/, tests/</pre>
+
+  <div class="box box-ok">
+    <div class="ico">✅</div>
+    <div><b>Si ves todos estos archivos, estás listo.</b> No hay que "instalar" nada más.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="arrancar">
+  <h2><span class="num">2</span>Cómo arrancar la app</h2>
+  <p class="sec-sub">El paso más importante: NO uses doble clic en index.html</p>
+
+  <div class="box box-danger">
+    <div class="ico">⚠️</div>
+    <div><b>MUY IMPORTANTE:</b> NO abras <code>index.html</code> con doble clic. La app <b>necesita un servidor local</b> para funcionar correctamente. Si la abrís con doble clic, vas a ver errores de <b>CORS</b> y no va a poder cargar datos de Discogs ni Last.fm.</div>
+  </div>
+
+  <h3>🪟 Windows</h3>
+  <ol class="steps">
+    <li><b>Buscá el archivo <code>INICIAR.bat</code></b> en la carpeta de la app.<span class="hint">Es un archivo con ícono de engranaje o ventana negra.</span></li>
+    <li><b>Hacé doble clic en <code>INICIAR.bat</code>.</b><span class="hint">Si Windows te pide permiso, aceptá. Si te dice "Windows protegió tu PC", hacé clic en "Más información" y luego "Ejecutar de todos modos".</span></li>
+    <li><b>Se abre una ventana negra</b> que dice "DISCOGRAFIA v8.0.0 - Iniciando servidor".<span class="hint">NO cierres esa ventana mientras usás la app.</span></li>
+    <li><b>El navegador se abre solo</b> en <code>http://localhost:8080</code>.<span class="hint">Si no se abre solo, abrí el navegador y escribí manualmente http://localhost:8080</span></li>
+    <li><b>Ya estás dentro.</b> Cargá tus CDs.</li>
+    <li><b>Para cerrar la app:</b> cerrá el navegador y después la ventana negra (o presioná Ctrl+C).</li>
+  </ol>
+
+  <h3>🍎 Mac</h3>
+  <ol class="steps">
+    <li>Abrí <b>Terminal</b> (Cmd + Espacio → "Terminal").</li>
+    <li>Escribí <code>cd </code> (con espacio al final).</li>
+    <li><b>Arrastrá la carpeta</b> de la app a la ventana de Terminal. Se completa la ruta.</li>
+    <li>Presioná <b>Enter</b>.</li>
+    <li>Escribí <code>chmod +x INICIAR.sh</code> y Enter.<span class="hint">Esto le da permisos al script. Solo hay que hacerlo una vez.</span></li>
+    <li>Escribí <code>./INICIAR.sh</code> y Enter.</li>
+    <li>El navegador se abre solo en <code>http://localhost:8080</code>.</li>
+  </ol>
+
+  <h3>🐧 Linux</h3>
+  <p>Igual que Mac, pero podés usar también:</p>
+  <ul>
+    <li><code>python3 -m http.server 8080</code> dentro de la carpeta</li>
+    <li>O el <code>INICIAR.sh</code> que ya viene preparado</li>
+  </ul>
+
+  <div class="box box-tip">
+    <div class="ico">💡</div>
+    <div><b>Truco:</b> podés crear un acceso directo al <code>INICIAR.bat</code> en tu escritorio. Así arrancás la app con doble clic, sin tener que buscar la carpeta cada vez.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="config">
+  <h2><span class="num">3</span>Configurar tokens (Discogs y Last.fm)</h2>
+  <p class="sec-sub">Opcional pero muy recomendado para enriquecer automáticamente</p>
+
+  <p>Si configurás estos servicios, la app puede buscar <b>automáticamente</b> portadas, años, sellos, géneros y códigos de catálogo. Sin ellos, tenés que cargar todo a mano.</p>
+
+  <h3>🎚️ Token de Discogs (el más importante)</h3>
+  <ol class="steps">
+    <li>Abrí <a href="https://www.discogs.com/settings/developers" target="_blank">discogs.com/settings/developers</a> en una pestaña nueva.<span class="hint">Si no tenés cuenta de Discogs, creala primero (es gratis).</span></li>
+    <li>Hacé clic en el botón <b>"Generate new token"</b>.</li>
+    <li>Discogs te muestra un token largo (tipo <code>AhjyiJIMYYvOi...</code>). <b>Copialo completo.</b></li>
+    <li>Volvé a la app. Menú <b>⚙️ → 🎚️ Configurar Discogs</b>.</li>
+    <li>Pegá el token en el campo "Token de Discogs".</li>
+    <li>Hacé clic en <span class="btn-demo primary">🔌 Probar</span>.<span class="hint">Debería decir ✅ "Token válido · Usuario: tu_nombre"</span></li>
+    <li>Hacé clic en <span class="btn-demo primary">💾 Guardar</span>.</li>
+  </ol>
+
+  <div class="box box-ok">
+    <div class="ico">✅</div>
+    <div><b>Listo.</b> Ahora al agregar CDs, la app buscará en Discogs automáticamente.</div>
+  </div>
+
+  <h3>🎵 API Key de Last.fm (opcional)</h3>
+  <ol class="steps">
+    <li>Abrí <a href="https://www.last.fm/api/account/create" target="_blank">last.fm/api/account/create</a>.</li>
+    <li>Completá el formulario:
+      <ul style="margin-top:8px">
+        <li><b>Application name:</b> Discografía</li>
+        <li><b>Application description:</b> Gestor personal de colección de CDs</li>
+        <li><b>Application URL:</b> dejar vacío</li>
+        <li><b>Callback URL:</b> dejar vacío</li>
+      </ul>
+    </li>
+    <li>Aceptá los términos y hacé clic en <b>Submit</b>.</li>
+    <li>Copiá la <b>API key</b> (32 caracteres hexadecimales, tipo <code>ba5a5c98...</code>).</li>
+    <li>En la app: <b>⚙️ → 🎵 Configurar Last.fm</b>.</li>
+    <li>Pegá la API key, hacé clic en <span class="btn-demo primary">🔌 Probar</span> y luego <span class="btn-demo primary">💾 Guardar</span>.</li>
+  </ol>
+
+  <div class="box box-tip">
+    <div class="ico">💡</div>
+    <div>Last.fm aporta datos especialmente buenos para <b>rock, metal, indie y música alternativa</b>. Discogs es más completo para todo lo demás.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="categorias">
+  <h2><span class="num">4</span>Categorías</h2>
+  <p class="sec-sub">Organizá tu colección en pestañas</p>
+
+  <p>Las <b>categorías</b> son pestañas que agrupan tus CDs. Ejemplos típicos: Rock, Jazz, Clásica, Nacional, Vinilos, Regalos.</p>
+
+  <h3>➕ Crear una categoría</h3>
+  <ol class="steps">
+    <li>En la parte superior de la app, buscá la pestaña con el <b>➕ Nueva categoría</b> (es la última).</li>
+    <li>O presioná <kbd>Ctrl</kbd> + <kbd>K</kbd> desde cualquier lugar.</li>
+    <li>Se abre un modal. Escribí el <b>nombre</b> en mayúsculas.<span class="hint">Ej: ROCK NACIONAL, JAZZ, CLÁSICA</span></li>
+    <li>Elegí un <b>emoji</b> de la lista (🎸 para rock, 🎷 para jazz, etc.).</li>
+    <li>Hacé clic en <span class="btn-demo primary">💾 Guardar</span>.</li>
+    <li>La nueva pestaña aparece arriba y queda activa.</li>
+  </ol>
+
+  <h3>✏️ Opciones de una categoría</h3>
+  <p>Pasá el mouse sobre la pestaña y va a aparecer un <b>⋯</b> al lado del nombre. Hacé clic ahí para:</p>
+  <ul>
+    <li><b>Renombrar:</b> cambiar el nombre</li>
+    <li><b>Cambiar icono:</b> elegir otro emoji</li>
+    <li><b>Mover izquierda / derecha:</b> reordenar las pestañas</li>
+    <li><b>Nueva subcategoría:</b> agrupar CDs dentro de la categoría (ver sección 5)</li>
+    <li><b>Nueva categoría aquí:</b> crear otra pestaña justo al lado</li>
+    <li><b>Eliminar categoría:</b> borrar la categoría completa (con todos sus CDs)</li>
+  </ul>
+
+  <div class="box box-warn">
+    <div class="ico">⚠️</div>
+    <div>Eliminar una categoría <b>borra todos los CDs que contiene</b>. Antes de eliminarla, exportá un backup o mové los CDs a otra categoría.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="subcategorias">
+  <h2><span class="num">5</span>Subcategorías</h2>
+  <p class="sec-sub">Un segundo nivel de organización dentro de cada categoría</p>
+
+  <p>Dentro de cada categoría podés crear <b>subcategorías</b>. Por ejemplo, si tenés la categoría "ROCK", podés tener subcategorías: "Nacional", "Internacional", "En vivo".</p>
+
+  <h3>➕ Crear una subcategoría</h3>
+  <ol class="steps">
+    <li><b>Entrá a la categoría</b> donde querés crear la subcategoría (no uses "Todas").</li>
+    <li>Justo debajo de las pestañas principales, vas a ver una fila de subtabs. Si no hay ninguna, verás el botón <b>➕ Crear primera subcategoría</b>.</li>
+    <li>Hacé clic en <b>➕</b>.</li>
+    <li>Escribí el <b>nombre</b> de la subcategoría y elegí un emoji.</li>
+    <li>Hacé clic en <span class="btn-demo primary">💾 Guardar</span>.</li>
+  </ol>
+
+  <h3>🎯 Asignar un CD a una subcategoría</h3>
+  <ol class="steps">
+    <li>Abrí el CD (doble clic en la fila, o clic en el 👁️).</li>
+    <li>En la parte superior del modal, buscá el campo <b>📂 Subcategoría</b>.</li>
+    <li>Seleccioná la subcategoría de la lista desplegable.</li>
+    <li>Guardá el CD.</li>
+  </ol>
+
+  <div class="box box-tip">
+    <div class="ico">💡</div>
+    <div>Cuando tenés muchas subcategorías, la fila de subtabs se vuelve scrollable horizontalmente. Podés moverte con la rueda del mouse.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="agregar-cd">
+  <h2><span class="num">6</span>Agregar un CD</h2>
+  <p class="sec-sub">El proceso más frecuente</p>
+
+  <h3>➕ Forma rápida</h3>
+  <ol class="steps">
+    <li>Presioná <kbd>Ctrl</kbd> + <kbd>N</kbd> o hacé clic en el botón <span class="btn-demo primary">➕ Nuevo CD</span>.</li>
+    <li>Se abre el modal con el cursor en el campo "Título".</li>
+    <li>Escribí el <b>título del álbum</b>.<span class="hint">Ej: THE DARK SIDE OF THE MOON</span></li>
+    <li>Escribí el <b>intérprete</b>.<span class="hint">Ej: PINK FLOYD</span></li>
+    <li>Hacé clic afuera del campo (o Tab).<span class="hint">✨ La app busca automáticamente en Discogs, MusicBrainz y Last.fm. Vas a ver un indicador con las fuentes consultadas.</span></li>
+    <li>Si encuentra datos, los completa solo: año, sello, género, portada, links de streaming.</li>
+    <li>Revisá que todo esté correcto. Podés editar cualquier campo.</li>
+    <li>Hacé clic en <span class="btn-demo primary">💾 Guardar</span> (o presioná Ctrl+Enter para guardar y crear otro).</li>
+  </ol>
+
+  <div class="box box-info">
+    <div class="ico">💡</div>
+    <div><b>Si no encuentra nada:</b> no pasa nada. Completá los campos a mano. El título y el intérprete son los únicos obligatorios.</div>
+  </div>
+
+  <h3>📷 Agregar con código de barras</h3>
+  <ol class="steps">
+    <li>Hacé clic en el botón <span class="btn-demo">📷</span> (al lado de "Nuevo CD").</li>
+    <li>Se abre la cámara. Apuntá al código de barras del CD.</li>
+    <li>Cuando lo detecta, vuelve al formulario con el código precargado.</li>
+    <li>La app va a buscar en Discogs por ese código exacto.</li>
+  </ol>
+
+  <h3>📝 Los 5 tabs del modal</h3>
+  <p>El formulario de CD tiene 5 pestañas, pero <b>solo Título e Intérprete son obligatorios</b>. Completá lo que puedas y dejá el resto vacío.</p>
+  <table>
+    <thead><tr><th>Tab</th><th>Qué contiene</th></tr></thead>
+    <tbody>
+      <tr><td><b>📀 Edición</b></td><td>Formato, estado, sello, género, año, Nº catálogo, código de barras, ISRC, edición, país</td></tr>
+      <tr><td><b>🔍 Estado físico</b></td><td>Estado del disco, caja, folleto, arte/carátula</td></tr>
+      <tr><td><b>📍 Ubicación y valor</b></td><td>Ubicación física, cantidad, fecha ingreso, valor, moneda, notas</td></tr>
+      <tr><td><b>📚 Préstamo</b></td><td>A quién, cuándo, cuándo devuelve, notas</td></tr>
+      <tr><td><b>🏷️ Etiquetas</b></td><td>Tags libres (hasta 12 por CD)</td></tr>
+      <tr><td><b>📝 Personalizados</b></td><td>Campos que vos mismo definas (opcional)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="editar-cd">
+  <h2><span class="num">7</span>Editar un CD</h2>
+  <p class="sec-sub">Cambiar datos de un disco ya cargado</p>
+
+  <ol class="steps">
+    <li><b>Buscá el CD</b> en la tabla (o usá el buscador).</li>
+    <li>Hacé clic en el ícono <span class="btn-demo">✏️</span> de la fila.</li>
+    <li>Se abre el modal con todos los datos cargados.</li>
+    <li>Modificá lo que necesites.</li>
+    <li>Hacé clic en <span class="btn-demo primary">💾 Guardar</span>.</li>
+  </ol>
+
+  <div class="box box-tip">
+    <div class="ico">💡</div>
+    <div><b>Atajos útiles:</b> con las flechas ↑ ↓ navegás entre CDs sin usar el mouse. Con <kbd>Enter</kbd> abrís el CD enfocado para editar.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="eliminar-cd">
+  <h2><span class="num">8</span>Eliminar un CD</h2>
+  <p class="sec-sub">Borrar un disco de la colección</p>
+
+  <ol class="steps">
+    <li>Hacé clic en el ícono <span class="btn-demo danger">🗑️</span> de la fila del CD.</li>
+    <li>La app te pide confirmación con los datos del CD.</li>
+    <li>Confirmá.</li>
+  </ol>
+
+  <div class="box box-ok">
+    <div class="ico">✅</div>
+    <div><b>Podés deshacer:</b> presioná <kbd>Ctrl</kbd> + <kbd>Z</kbd> o hacé clic en el botón ↶ de la barra superior.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="buscar">
+  <h2><span class="num">9</span>Buscar y filtrar</h2>
+  <p class="sec-sub">Encontrar CDs en tu colección</p>
+
+  <h3>🔍 Búsqueda simple</h3>
+  <ol class="steps">
+    <li>Escribí en el buscador de la barra superior.<span class="hint">Busca en título, intérprete, sello, año, ubicación y N° catálogo al mismo tiempo.</span></li>
+    <li>Los resultados se actualizan mientras escribís.</li>
+    <li>Los términos que coinciden se resaltan en amarillo.</li>
+  </ol>
+
+  <h3>🎯 Búsqueda avanzada</h3>
+  <p>Usá la sintaxis especial para búsquedas más precisas:</p>
+  <table>
+    <thead><tr><th>Escribís</th><th>Busca</th></tr></thead>
+    <tbody>
+      <tr><td><code>artist:pink</code></td><td>Solo en el campo intérprete</td></tr>
+      <tr><td><code>title:wall</code></td><td>Solo en el campo título</td></tr>
+      <tr><td><code>year:1969</code></td><td>Año exacto 1969</td></tr>
+      <tr><td><code>year:&gt;1980</code></td><td>Años posteriores a 1980</td></tr>
+      <tr><td><code>year:&lt;1970</code></td><td>Años anteriores a 1970</td></tr>
+      <tr><td><code>genre:rock</code></td><td>Género que contenga "rock"</td></tr>
+      <tr><td><code>tag:favorito</code></td><td>CDs con la etiqueta "favorito"</td></tr>
+      <tr><td><code>prestado:true</code></td><td>CDs actualmente prestados</td></tr>
+      <tr><td><code>rock AND 1969</code></td><td>Ambas condiciones</td></tr>
+      <tr><td><code>beatles OR stones</code></td><td>Cualquiera de las dos</td></tr>
+      <tr><td><code>-beatles</code></td><td>Que NO contenga "beatles"</td></tr>
+    </tbody>
+  </table>
+  <p>Cuando la app detecta sintaxis avanzada, muestra un badge <b>"AVANZADA"</b> al lado del buscador.</p>
+
+  <h3>⚙️ Filtros avanzados</h3>
+  <ol class="steps">
+    <li>Hacé clic en el botón <span class="btn-demo">⚙️</span> al lado del buscador.</li>
+    <li>Se despliega un panel con filtros: estado, formato, rango de años, ubicación, portada, préstamo.</li>
+    <li>Elegí los valores que quieras.</li>
+    <li>El listado se filtra automáticamente.</li>
+    <li>Para limpiar todo: <span class="btn-demo">✕ Limpiar</span>.</li>
+  </ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="seleccion">
+  <h2><span class="num">10</span>Selección múltiple</h2>
+  <p class="sec-sub">Hacer acciones con varios CDs a la vez</p>
+
+  <ol class="steps">
+    <li><b>Tildá el checkbox</b> a la izquierda de cada CD que quieras seleccionar.<span class="hint">O usá la barra espaciadora sobre la fila enfocada.</span></li>
+    <li><b>Para seleccionar todos:</b> tildá el checkbox del encabezado de la tabla.</li>
+    <li>Aparece una <b>barra de acciones</b> arriba de la tabla con las siguientes opciones:</li>
+  </ol>
+
+  <table>
+    <thead><tr><th>Botón</th><th>Qué hace</th></tr></thead>
+    <tbody>
+      <tr><td><span class="btn-demo">🏷️ Estado</span></td><td>Cambiar el estado general de todos los seleccionados</td></tr>
+      <tr><td><span class="btn-demo">📍 Ubicación</span></td><td>Asignar la misma ubicación a todos</td></tr>
+      <tr><td><span class="btn-demo">📁 Mover</span></td><td>Mover a otra categoría</td></tr>
+      <tr><td><span class="btn-demo">🖼️ Portadas</span></td><td>Buscar portadas faltantes</td></tr>
+      <tr><td><span class="btn-demo">🏷️ Etiquetas</span></td><td>Generar etiquetas imprimibles</td></tr>
+      <tr><td><span class="btn-demo danger">🗑️ Eliminar</span></td><td>Borrar todos los seleccionados</td></tr>
+      <tr><td><span class="btn-demo">✕ Cancelar</span></td><td>Deseleccionar todo</td></tr>
+    </tbody>
+  </table>
+
+  <div class="box box-warn">
+    <div class="ico">⚠️</div>
+    <div>Antes de usar "Eliminar" con muchos CDs, <b>exportá un backup</b>. Aunque existe deshacer, con muchas operaciones seguidas puede perderse el historial.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="enriquecer">
+  <h2><span class="num">11</span>Enriquecer (buscar datos automáticamente)</h2>
+  <p class="sec-sub">La función más útil para cargar rápido</p>
+
+  <p>El <b>enriquecimiento</b> busca automáticamente datos de tus CDs en 3 fuentes: <b>Discogs → MusicBrainz → Last.fm</b>. Completa año, sello, género, país, N° catálogo y portada.</p>
+
+  <h3>⚡ Enriquecer un solo CD</h3>
+  <p>Cuando editás un CD, la app lo enriquece automáticamente al salir del campo "Título" o "Intérprete". Verás una barra indicando qué fuentes está consultando.</p>
+
+  <h3>🚀 Enriquecer toda la colección</h3>
+  <ol class="steps">
+    <li>Presioná <kbd>Ctrl</kbd> + <kbd>E</kbd> o hacé clic en <span class="btn-demo warn">✨ Enriquecer</span> en la barra superior.</li>
+    <li>Se abre el modal de enriquecimiento masivo.</li>
+    <li><b>Elegí qué campos completar:</b> año, año edición, sello, género, país, catálogo, portada, links.</li>
+    <li><b>Elegí el alcance:</b>
+      <ul style="margin-top:6px">
+        <li><b>Solo datos faltantes:</b> solo completa CDs incompletos</li>
+        <li><b>Toda la colección:</b> revisa todos los CDs</li>
+        <li><b>Re-chequear:</b> fuerza a buscar incluso si ya tienen datos</li>
+      </ul>
+    </li>
+    <li><b>Elegí las fuentes:</b> Discogs, MusicBrainz, Last.fm. Podés activar/desactivar cada una.</li>
+    <li><b>Comportamiento:</b> si reemplaza datos existentes o solo completa vacíos.</li>
+    <li>Hacé clic en <span class="btn-demo primary">🚀 Iniciar</span>.</li>
+    <li>Vas a ver el progreso en tiempo real con el log de cada CD.</li>
+    <li>Al terminar, tenés un resumen: cuántos enriquecidos, cuántas portadas nuevas, etc.</li>
+  </ol>
+
+  <div class="box box-info">
+    <div class="ico">💡</div>
+    <div><b>Rendimiento:</b> el enriquecimiento corre <b>3 CDs en paralelo</b>. Con una colección de 100 CDs, tarda entre 5 y 15 minutos dependiendo de las APIs.</div>
+  </div>
+
+  <div class="box box-warn">
+    <div class="ico">⚠️</div>
+    <div><b>Discogs tiene rate limit</b> de ~60 requests por minuto. Si enriquecés muchos CDs seguidos, verás errores 429. La app se enfría automáticamente por 30-60 segundos. <b>Recomendación:</b> enriquecé en lotes de 20-30 CDs.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="tags">
+  <h2><span class="num">12</span>Etiquetas (tags)</h2>
+  <p class="sec-sub">Marcá CDs con palabras clave para filtrar después</p>
+
+  <h3>🏷️ ¿Para qué sirven?</h3>
+  <p>A diferencia de las categorías (una sola por CD), un CD puede tener <b>hasta 12 etiquetas</b> al mismo tiempo. Son ideales para marcar cosas transversales:</p>
+  <ul>
+    <li><code>favorito</code> → tus discos preferidos</li>
+    <li><code>para_vender</code> → los que querés vender</li>
+    <li><code>regalo</code> → los que vas a regalar</li>
+    <li><code>autografiado</code> → con firma del artista</li>
+    <li><code>para_digitalizar</code> → pendientes de ripear</li>
+    <li><code>en_mal_estado</code> → para reemplazar</li>
+  </ul>
+
+  <h3>➕ Agregar etiquetas a un CD</h3>
+  <ol class="steps">
+    <li>Abrí el CD para editar (<span class="btn-demo">✏️</span>).</li>
+    <li>Andá a la pestaña <b>🏷️ Etiquetas</b>.</li>
+    <li>Escribí el nombre de la etiqueta en el campo de texto.<span class="hint">Ej: favorito</span></li>
+    <li>Presioná <kbd>Enter</kbd> o <kbd>,</kbd>.<span class="hint">Se agrega como chip de color.</span></li>
+    <li>Repetí para agregar más.</li>
+    <li>Guardá el CD.</li>
+  </ol>
+
+  <h3>🔍 Filtrar por etiqueta</h3>
+  <ol class="steps">
+    <li>En la barra superior, hacé clic en el botón <span class="btn-demo">🏷️</span>.</li>
+    <li>Aparece un menú con todas las etiquetas que usaste, ordenadas por cantidad de uso.</li>
+    <li>Hacé clic en una para filtrar la tabla.</li>
+    <li>Para quitar el filtro: clic en la etiqueta de nuevo, o en el chip que aparece arriba de la tabla.</li>
+  </ol>
+
+  <h3>⚙️ Gestionar todas las etiquetas</h3>
+  <p>Desde el mismo menú 🏷️ → <b>⚙️ Gestionar etiquetas</b>. Vas a ver:</p>
+  <ul>
+    <li>Cuántas veces se usa cada etiqueta</li>
+    <li>Filtrar por una etiqueta específica</li>
+    <li>Eliminar una etiqueta de TODOS los CDs</li>
+  </ul>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="workspaces">
+  <h2><span class="num">13</span>Multi-colección (Workspaces)</h2>
+  <p class="sec-sub">Tener varias colecciones totalmente independientes</p>
+
+  <p>Los <b>workspaces</b> son colecciones separadas: cada una tiene sus propios CDs, categorías, etiquetas e historial. Son como bases de datos paralelas.</p>
+
+  <h3>📚 Casos de uso</h3>
+  <ul>
+    <li><b>Colección personal</b> + <b>Colección de vinilos</b> + <b>Colección de papá</b></li>
+    <li><b>Colección activa</b> + <b>Colección vendida</b> + <b>Wishlist</b></li>
+    <li><b>Colección propia</b> + <b>Colección para tasar un cliente</b></li>
+  </ul>
+
+  <h3>🔄 Cambiar entre colecciones</h3>
+  <ol class="steps">
+    <li>En el header, al lado del logo, hay un <b>botón con el nombre de la colección actual</b> (por defecto: "💿 Mi colección").</li>
+    <li>Hacé clic ahí.</li>
+    <li>Se abre el menú con todas tus colecciones.</li>
+    <li>Hacé clic en la que quieras usar.</li>
+    <li>Confirmá. La app se recarga automáticamente.</li>
+  </ol>
+
+  <h3>➕ Crear una colección nueva</h3>
+  <ol class="steps">
+    <li>Hacé clic en el selector de colección.</li>
+    <li>Clic en <b>➕ Nueva colección</b>.</li>
+    <li>Escribí el nombre.<span class="hint">Ej: Vinilos</span></li>
+    <li>Elegí un ícono y un color.</li>
+    <li>Guardá.</li>
+    <li>La app te pregunta si querés cambiar a la nueva colección ahora. Sí o no, vos decidís.</li>
+  </ol>
+
+  <div class="box box-tip">
+    <div class="ico">💡</div>
+    <div>Cada colección guarda su propia configuración de <b>categorías, subcategorías, campos personalizados e historial</b>. Los tokens de Discogs y Last.fm se comparten entre todas.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="duplicados">
+  <h2><span class="num">14</span>Duplicados y merge</h2>
+  <p class="sec-sub">Detectar CDs repetidos y fusionarlos</p>
+
+  <h3>🔍 Buscar duplicados</h3>
+  <ol class="steps">
+    <li>Presioná <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd>.</li>
+    <li>La app analiza toda la colección con 92% de similitud.</li>
+    <li>Si encuentra grupos de CDs similares, los muestra agrupados.</li>
+    <li>Para cada grupo podés:
+      <ul style="margin-top:6px">
+        <li><b>🔀 Fusionar:</b> unir dos CDs en uno (ver abajo)</li>
+        <li><b>🗑️ Eliminar:</b> borrar el que sobra</li>
+      </ul>
+    </li>
+  </ol>
+
+  <h3>🔀 Fusionar dos CDs</h3>
+  <p>Esta es la opción más útil cuando tenés el mismo disco cargado dos veces con datos distintos.</p>
+  <ol class="steps">
+    <li>En el modal de duplicados, hacé clic en <span class="btn-demo">🔀 Fusionar</span> al lado del grupo.</li>
+    <li>Se abre un modal comparando los dos CDs <b>campo por campo</b>.</li>
+    <li>Solo se muestran los campos donde <b>difieren</b>. Los iguales se copian solos.</li>
+    <li>Para cada campo, elegí si conservar el valor del <b>primario</b> (izquierda) o del <b>secundario</b> (derecha).</li>
+    <li>Hacé clic en <span class="btn-demo primary">🔀 Fusionar</span>.</li>
+    <li>El primario se queda con los datos elegidos. El secundario se elimina.</li>
+    <li>Los links, campos personalizados y etiquetas de ambos se combinan automáticamente.</li>
+  </ol>
+
+  <div class="box box-ok">
+    <div class="ico">✅</div>
+    <div>El merge conserva el <b>Nº e ID</b> del CD primario. El secundario se elimina. Todo esto se puede deshacer con <kbd>Ctrl</kbd>+<kbd>Z</kbd>.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="prestamos">
+  <h2><span class="num">15</span>Préstamos</h2>
+  <p class="sec-sub">Registrar CDs prestados y controlar devoluciones</p>
+
+  <h3>📚 Registrar un préstamo</h3>
+  <ol class="steps">
+    <li>Abrí el CD que vas a prestar.</li>
+    <li>Andá a la pestaña <b>📚 Préstamo</b>.</li>
+    <li>Completá:
+      <ul style="margin-top:6px">
+        <li><b>Prestado a:</b> nombre de la persona</li>
+        <li><b>Fecha préstamo:</b> cuándo se lo llevó</li>
+        <li><b>Fecha devolución:</b> cuándo debería devolverlo (opcional)</li>
+        <li><b>Notas:</b> cualquier aclaración</li>
+      </ul>
+    </li>
+    <li>Guardá el CD.</li>
+    <li>En la tabla va a aparecer un <b>badge 📤</b> al lado del intérprete.</li>
+  </ol>
+
+  <h3>👁️ Ver todos los préstamos</h3>
+  <ol class="steps">
+    <li>Presioná <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd>.</li>
+    <li>Se abre el modal con todos los CDs prestados.</li>
+    <li>Los que están <b>vencidos</b> aparecen marcados en rojo.</li>
+    <li>Hacé clic en <span class="btn-demo">↩️ Devolver</span> cuando te devuelvan el CD.</li>
+  </ol>
+
+  <div class="box box-info">
+    <div class="ico">💡</div>
+    <div>Podés filtrar la tabla principal por préstamos: botón ⚙️ → filtro "Préstamo" → "Vencidos".</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="filtros-guardados">
+  <h2><span class="num">16</span>Filtros guardados</h2>
+  <p class="sec-sub">Guardar combinaciones de filtros para reusar</p>
+
+  <p>Si constantemente filtrás tu colección de la misma manera (por ejemplo: "rock de los 70 que NO tengo prestados"), podés guardar esa combinación con un nombre.</p>
+
+  <h3>💾 Guardar filtros</h3>
+  <ol class="steps">
+    <li>Aplicá los filtros que quieras: búsqueda, filtros avanzados, etiqueta, artista, categoría, ordenamiento.</li>
+    <li>Hacé clic en el botón <span class="btn-demo">💾</span> en la barra superior.</li>
+    <li>Clic en <b>Guardar filtros actuales</b>.</li>
+    <li>Ponele un nombre.<span class="hint">Ej: "Rock argentino años 80"</span></li>
+    <li>Elegí un ícono.</li>
+    <li>Guardá.</li>
+  </ol>
+
+  <h3>🎯 Aplicar un filtro guardado</h3>
+  <ol class="steps">
+    <li>Hacé clic en el botón <span class="btn-demo">💾</span>.</li>
+    <li>En la lista, hacé clic sobre el filtro que quieras aplicar.</li>
+    <li>La tabla se filtra automáticamente.</li>
+  </ol>
+
+  <div class="box box-tip">
+    <div class="ico">💡</div>
+    <div><b>Tip avanzado:</b> podés acceder a los filtros guardados también desde la Command Palette (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd>) escribiendo "Aplicar filtro".</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="command-palette">
+  <h2><span class="num">17</span>Command palette</h2>
+  <p class="sec-sub">Acceder a TODO sin usar el mouse</p>
+
+  <ol class="steps">
+    <li>Presioná <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd> desde cualquier parte.</li>
+    <li>Se abre un cuadro de búsqueda.</li>
+    <li>Empezá a escribir: <b>nuevo</b>, <b>dashboard</b>, <b>exportar</b>, <b>ir a rock</b>, <b>aplicar filtro...</b>.</li>
+    <li>Usá las flechas <kbd>↑</kbd> <kbd>↓</kbd> para navegar.</li>
+    <li>Presioná <kbd>Enter</kbd> para ejecutar.</li>
+  </ol>
+
+  <p>La paleta <b>aprende de tu uso</b>: los comandos que más usás aparecen arriba.</p>
+
+  <h3>Qué podés hacer con la paleta</h3>
+  <ul>
+    <li>Abrir cualquier modal (nuevo CD, nueva categoría, etc.)</li>
+    <li>Ir directamente a cualquier categoría</li>
+    <li>Aplicar cualquier filtro guardado</li>
+    <li>Exportar en cualquier formato</li>
+    <li>Cambiar tema, idioma, colección</li>
+    <li>Herramientas: duplicados, préstamos, historial</li>
+    <li>Vaciar caché, diagnosticar red, buscar actualización</li>
+  </ul>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="exportar">
+  <h2><span class="num">18</span>Exportar</h2>
+  <p class="sec-sub">Guardar tu colección en distintos formatos</p>
+
+  <p>Hacé clic en el botón <span class="btn-demo">📤 Exportar</span> de la barra superior. Se abre un menú con las opciones:</p>
+
+  <table>
+    <thead><tr><th>Opción</th><th>Qué genera</th><th>Cuándo usarla</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>💾 JSON completo</b></td>
+        <td>Backup total de TODAS las categorías</td>
+        <td>Backup periódico, migrar a otra PC</td>
+      </tr>
+      <tr>
+        <td><b>📄 JSON de categoría</b></td>
+        <td>Solo la categoría actual</td>
+        <td>Compartir una categoría específica</td>
+      </tr>
+      <tr>
+        <td><b>📊 CSV (Excel)</b></td>
+        <td>Hoja de cálculo con todos los campos</td>
+        <td>Análisis en Excel, Google Sheets</td>
+      </tr>
+      <tr>
+        <td><b>📝 Texto con formato</b></td>
+        <td>Tabla en Markdown</td>
+        <td>Documentación, WhatsApp, notas</td>
+      </tr>
+      <tr>
+        <td><b>📄 PDF (con portadas)</b></td>
+        <td>PDF listo para imprimir con imágenes</td>
+        <td>Catálogo impreso, regalar</td>
+      </tr>
+      <tr>
+        <td><b>🖨️ Imprimir</b></td>
+        <td>Vista para imprimir del navegador</td>
+        <td>Listados rápidos</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="box box-info">
+    <div class="ico">💡</div>
+    <div>Si configuraste una <b>carpeta predeterminada</b> (⚙️ → 📁), los backups se guardan directamente ahí sin pasar por descargas.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="importar">
+  <h2><span class="num">19</span>Importar</h2>
+  <p class="sec-sub">Cargar datos desde un backup</p>
+
+  <h3>📥 Restaurar un backup JSON</h3>
+  <ol class="steps">
+    <li>Botón <span class="btn-demo">📥 Importar</span> → <b>Desde archivo</b>.</li>
+    <li>Elegí el archivo <code>.json</code> que exportaste antes.</li>
+    <li>La app detecta el formato y te pregunta si querés <b>reemplazar</b> toda la base o <b>agregar</b> los datos.</li>
+    <li>Confirmá según corresponda.</li>
+  </ol>
+
+  <h3>📊 Importar CSV</h3>
+  <ol class="steps">
+    <li><b>Elegí primero una categoría</b> (no "Todas").</li>
+    <li>Botón 📥 → Desde archivo → elegí el <code>.csv</code>.</li>
+    <li>La app detecta automáticamente el separador (<code>;</code> o <code>,</code>).</li>
+    <li>Elegí REEMPLAZAR o AGREGAR.</li>
+  </ol>
+
+  <div class="box box-ok">
+    <div class="ico">✅</div>
+    <div><b>Migración automática:</b> si importás un backup de una versión vieja (v1, v4, v5), la app lo migra automáticamente al formato actual sin perder datos.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="backup">
+  <h2><span class="num">20</span>Backup automático</h2>
+  <p class="sec-sub">La app te recuerda hacer backup periódicamente</p>
+
+  <p>Cada vez que hacés un cambio importante (agregar CD, editar, eliminar, importar), la app <b>acumula cambios</b>. Después de 4 segundos sin actividad, si hay cambios pendientes, te muestra un modal recordándote hacer backup.</p>
+
+  <h3>💾 Opciones del modal</h3>
+  <ul>
+    <li><b>💾 Sí, hacer copia:</b> descarga un backup JSON ahora</li>
+    <li><b>Ahora no:</b> pospone el recordatorio 2 minutos</li>
+    <li><b>No volver a preguntar:</b> desactiva el recordatorio (podés reactivarlo desde ⚙️ → 📤 → checkbox)</li>
+  </ul>
+
+  <div class="box box-warn">
+    <div class="ico">⚠️</div>
+    <div>Si desactivás el backup automático, <b>acordate de exportar manualmente</b> con <kbd>Ctrl</kbd>+<kbd>S</kbd> cada tanto. Tus datos viven solo en este navegador.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="etiquetas-imprimir">
+  <h2><span class="num">21</span>Etiquetas imprimibles</h2>
+  <p class="sec-sub">Generar etiquetas con código QR para las cajas</p>
+
+  <h3>🏷️ Generar etiquetas</h3>
+  <ol class="steps">
+    <li>Seleccioná los CDs que querés etiquetar (checkbox a la izquierda).</li>
+    <li>En la barra de selección, hacé clic en <span class="btn-demo">🏷️ Etiquetas</span>.</li>
+    <li>Se abre el modal de configuración.</li>
+    <li><b>Elegí el formato:</b>
+      <ul style="margin-top:6px">
+        <li><b>Chico (Avery L7651):</b> 38×21mm, 65 etiquetas por hoja A4</li>
+        <li><b>Mediano (Avery L7159):</b> 63×38mm, 21 etiquetas por hoja</li>
+        <li><b>Grande (Avery L7163):</b> 99×38mm, 14 etiquetas por hoja</li>
+        <li><b>Personalizado:</b> si tenés otro tipo de pliego</li>
+      </ul>
+    </li>
+    <li><b>Elegí los campos:</b> título, intérprete, año, Nº, categoría, sello, ubicación.</li>
+    <li><b>¿Incluir QR?</b> Sí = cada etiqueta tiene un QR que apunta al CD en la app.</li>
+    <li><b>Alcance:</b> selección actual, filtrado, categoría actual o toda la colección.</li>
+    <li>Hacé clic en <span class="btn-demo primary">🖨️ Imprimir etiquetas</span>.</li>
+    <li>Se abre una pestaña nueva con la vista previa.</li>
+    <li>Se lanza automáticamente el diálogo de impresión del navegador.</li>
+  </ol>
+
+  <div class="box box-warn">
+    <div class="ico">⚠️</div>
+    <div><b>En el diálogo de impresión, elegí "Tamaño real" o "100%"</b>, NO "Ajustar a página". Si no, las etiquetas no van a coincidir con el pliego Avery.</div>
+  </div>
+
+  <div class="box box-tip">
+    <div class="ico">💡</div>
+    <div><b>El QR apunta a</b> <code>http://localhost:8080/#open?cd=...</code>. Si escaneás el QR desde el celular, no va a funcionar porque "localhost" es tu PC. Para que funcione, usá la IP de tu PC en la red: <code>http://192.168.1.XXX:8080</code>. O usá el modo "texto plano" del QR, que siempre funciona.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="pdf">
+  <h2><span class="num">22</span>PDF con portadas</h2>
+  <p class="sec-sub">Generar un catálogo imprimible</p>
+
+  <ol class="steps">
+    <li>Elegí la categoría que querés exportar (o "Todas").</li>
+    <li>Botón <span class="btn-demo">📤</span> → <b>📄 PDF (con portadas)</b>.</li>
+    <li>Se abre una pestaña con vista previa.</li>
+    <li>Se lanza el diálogo de impresión.</li>
+    <li>Elegí <b>"Guardar como PDF"</b> en lugar de la impresora física.</li>
+    <li>Guardá el archivo donde quieras.</li>
+  </ol>
+
+  <p>El PDF incluye:</p>
+  <ul>
+    <li>Encabezado con el nombre de tu colección y datos del propietario</li>
+    <li>Listado con portadas en miniatura</li>
+    <li>Nº, título, intérprete, año, año edición, formato, sello, valor</li>
+    <li>Total de CDs y valor total estimado</li>
+    <li>Pie de página con tu autoría</li>
+  </ul>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="idioma">
+  <h2><span class="num">23</span>Cambiar idioma</h2>
+  <p class="sec-sub">Español, Inglés y Portugués</p>
+
+  <ol class="steps">
+    <li>Botón <span class="btn-demo">⚙️</span> → arriba del todo: <b>🌎 Idioma</b>.</li>
+    <li>Elegí entre:
+      <ul style="margin-top:6px">
+        <li>🇦🇷 Español</li>
+        <li>🇺🇸 English</li>
+        <li>🇧🇷 Português</li>
+      </ul>
+    </li>
+    <li>La app se traduce al instante.</li>
+    <li>El idioma se guarda automáticamente.</li>
+  </ol>
+
+  <p>Las <b>fechas, números y monedas</b> también cambian de formato según el idioma:</p>
+  <table>
+    <thead><tr><th>Idioma</th><th>Número</th><th>Fecha</th></tr></thead>
+    <tbody>
+      <tr><td>Español</td><td>1.234,56</td><td>15/6/2024</td></tr>
+      <tr><td>English</td><td>1,234.56</td><td>6/15/2024</td></tr>
+      <tr><td>Português</td><td>1.234,56</td><td>15/06/2024</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="tema">
+  <h2><span class="num">24</span>Tema claro/oscuro</h2>
+  <p class="sec-sub">Cambiar la apariencia</p>
+
+  <ul>
+    <li><b>Botón ☀️/🌙</b> en el header, al lado del logo</li>
+    <li>O presioná <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>T</kbd></li>
+    <li>O desde la Command Palette: "cambiar tema"</li>
+  </ul>
+
+  <p>El tema se guarda automáticamente.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="atajos">
+  <h2><span class="num">25</span>Atajos de teclado</h2>
+  <p class="sec-sub">Referencia completa</p>
+
+  <p>Para ver todos los atajos dentro de la app: presioná <kbd>F2</kbd>.</p>
+
+  <table class="shortcut-table">
+    <thead><tr><th>Atajo</th><th>Acción</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>F1</kbd></td><td>Abrir manual de uso</td></tr>
+      <tr><td><kbd>F2</kbd></td><td>Ver atajos de teclado</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd></td><td>Command palette</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>N</kbd></td><td>Nuevo CD</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Nueva categoría</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>E</kbd></td><td>Enriquecer colección</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>D</kbd></td><td>Dashboard / Panel</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>G</kbd></td><td>Vista cuadrícula</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>F</kbd></td><td>Filtros avanzados</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Exportar backup JSON</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd></td><td>Deshacer última acción</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd></td><td>Buscar duplicados</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd></td><td>Ver préstamos</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd></td><td>Historial de actividad</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></td><td>Etiquetas imprimibles</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></td><td>Cambiar tema</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Q</kbd></td><td>Salir del sistema</td></tr>
+      <tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>Navegar entre CDs</td></tr>
+      <tr><td><kbd>Enter</kbd></td><td>Editar CD enfocado</td></tr>
+      <tr><td><kbd>Delete</kbd></td><td>Eliminar CD enfocado</td></tr>
+      <tr><td><kbd>Espacio</kbd></td><td>Seleccionar/deseleccionar CD</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>Cerrar modal / limpiar filtros</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="dashboard">
+  <h2><span class="num">26</span>Dashboard</h2>
+  <p class="sec-sub">Análisis visual de tu colección</p>
+
+  <ol class="steps">
+    <li>Presioná <kbd>Ctrl</kbd> + <kbd>D</kbd> o hacé clic en <span class="btn-demo">📊 Panel</span>.</li>
+    <li>Vas a ver:
+      <ul style="margin-top:6px">
+        <li><b>KPIs:</b> total de CDs, intérpretes, años, valor total</li>
+        <li><b>Gráfico de torta:</b> distribución por categoría</li>
+        <li><b>Top 10 intérpretes:</b> los que más tenés</li>
+        <li><b>Línea de tiempo:</b> CDs por década</li>
+        <li><b>Top sellos y años</b></li>
+        <li><b>Nube de palabras</b> con los intérpretes más frecuentes</li>
+        <li><b>Salud de la colección:</b> qué % tiene cada campo completo</li>
+      </ul>
+    </li>
+    <li>Al final hay una <b>proyección de valor</b> con interés compuesto.</li>
+  </ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="offline">
+  <h2><span class="num">27</span>Modo offline</h2>
+  <p class="sec-sub">La app funciona sin internet</p>
+
+  <p>Después de la primera carga, la app se guarda en tu navegador (Service Worker). Eso significa que podés:</p>
+
+  <ul>
+    <li><b>Ver tu colección</b> sin internet</li>
+    <li><b>Editar CDs</b> sin internet</li>
+    <li><b>Buscar y filtrar</b> sin internet</li>
+    <li><b>Exportar</b> sin internet</li>
+  </ul>
+
+  <p>Lo que <b>NO</b> funciona sin internet:</p>
+  <ul>
+    <li>Enriquecer datos (necesita Discogs, MusicBrainz, Last.fm)</li>
+    <li>Buscar portadas nuevas</li>
+    <li>Resolver links de streaming</li>
+  </ul>
+
+  <div class="box box-info">
+    <div class="ico">💡</div>
+    <div>Si estás offline y tratás de enriquecer, la app te avisa con un mensaje claro en lugar de fallar en silencio.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="actualizaciones">
+  <h2><span class="num">28</span>Actualizaciones</h2>
+  <p class="sec-sub">Cómo detectar y aplicar nuevas versiones</p>
+
+  <p>La app verifica automáticamente si hay una versión nueva del Service Worker. Si la encuentra, te muestra un toast abajo a la derecha:</p>
+
+  <div class="box box-info">
+    <div class="ico">🆕</div>
+    <div><b>Nueva versión disponible</b> · <span class="btn-demo primary">🔄 Recargar</span></div>
+  </div>
+
+  <ol class="steps">
+    <li>Hacé clic en <b>🔄 Recargar</b>.</li>
+    <li>La app descarga la nueva versión y se reinicia.</li>
+    <li>Tus datos se conservan intactos.</li>
+  </ol>
+
+  <p>También podés forzar la búsqueda manualmente desde: <b>⚙️ → 🔄 Buscar actualización</b>.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="problemas">
+  <h2><span class="num">29</span>Problemas comunes</h2>
+  <p class="sec-sub">Soluciones rápidas a los errores más frecuentes</p>
+
+  <table>
+    <thead><tr><th>Síntoma</th><th>Causa</th><th>Solución</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Error <code>Access to fetch blocked by CORS policy</code></td>
+        <td>Estás abriendo con doble clic (<code>file://</code>)</td>
+        <td>Cerrá la pestaña. Abrí <code>INICIAR.bat</code> en su lugar.</td>
+      </tr>
+      <tr>
+        <td>Last.fm devuelve <code>403</code></td>
+        <td>API key incorrecta o mal copiada</td>
+        <td>Regenerá la key en last.fm/api. Copiala completa (32 caracteres).</td>
+      </tr>
+      <tr>
+        <td>Discogs devuelve <code>401</code></td>
+        <td>Token inválido</td>
+        <td>Regenerá el token en discogs.com/settings/developers</td>
+      </tr>
+      <tr>
+        <td>Discogs devuelve <code>429</code></td>
+        <td>Rate limit (demasiadas consultas)</td>
+        <td>Esperá 60 segundos. Enriquecé en lotes de 20-30 CDs.</td>
+      </tr>
+      <tr>
+        <td>Cover Art Archive devuelve <code>404</code></td>
+        <td>El release no tiene portada cargada</td>
+        <td>Es normal. Se ignora. Probá buscar portada manualmente.</td>
+      </tr>
+      <tr>
+        <td>El Service Worker no se registra</td>
+        <td>Estás en <code>file://</code></td>
+        <td>Serví por HTTP con <code>INICIAR.bat</code>.</td>
+      </tr>
+      <tr>
+        <td>No veo mis datos de la versión anterior</td>
+        <td>Migración en curso</td>
+        <td>Esperá 2-3 segundos, refrescá. Buscá <code>[Workspaces] migrada</code> en consola.</td>
+      </tr>
+      <tr>
+        <td>La tabla se traba con muchos CDs</td>
+        <td>Más de 100 CDs</td>
+        <td>Se activa virtual scrolling automáticamente. Si sigue lento, probá con menos filtros.</td>
+      </tr>
+      <tr>
+        <td>Las imágenes de portadas no cargan</td>
+        <td>Portada con URL inválida o rota</td>
+        <td>Editá el CD y borrá la portada. Volvé a buscarla.</td>
+      </tr>
+      <tr>
+        <td>Los atajos de teclado no funcionan</td>
+        <td>Foco en un campo de texto</td>
+        <td>Hacé clic afuera del campo o presioná Tab.</td>
+      </tr>
+      <tr>
+        <td>Al cambiar de idioma no se traduce todo</td>
+        <td>Algunos textos quedan en español</td>
+        <td>Es normal en esta versión. Se traducen progresivamente.</td>
+      </tr>
+      <tr>
+        <td>El QR de las etiquetas no abre nada</td>
+        <td>Apuntás a <code>localhost</code> desde otro dispositivo</td>
+        <td>Usá la IP de tu PC (<code>192.168.1.XXX</code>) o el modo texto plano.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="recuperar">
+  <h2><span class="num">30</span>Recuperar datos</h2>
+  <p class="sec-sub">Qué hacer si algo sale mal</p>
+
+  <h3>😱 "Desaparecieron mis CDs"</h3>
+  <ol class="steps">
+    <li><b>NO CIERRES LA APP.</b></li>
+    <li>Abrí la consola del navegador con <kbd>F12</kbd>.</li>
+    <li>En la pestaña "Console", escribí:
+      <pre style="background:#151a22;padding:10px;border-radius:6px;margin-top:8px;font-size:.82rem">DBStorage.getMode()</pre>
+    </li>
+    <li>Si dice <code>'idb'</code>, tus datos están en IndexedDB. Refrescá la página.</li>
+    <li>Si dice <code>'ls'</code>, tus datos están en localStorage. Refrescá.</li>
+    <li>Si nada funciona, escribí:
+      <pre style="background:#151a22;padding:10px;border-radius:6px;margin-top:8px;font-size:.82rem">Store.load()
+renderAll()</pre>
+    </li>
+  </ol>
+
+  <h3>🔄 Restaurar desde backup</h3>
+  <ol class="steps">
+    <li>Localizá tu último archivo <code>discografia_v8.0.0_backup_*.json</code>.</li>
+    <li>Botón 📥 → Desde archivo.</li>
+    <li>Elegí el archivo.</li>
+    <li>Confirmá REEMPLAZAR.</li>
+  </ol>
+
+  <h3>🗑️ "Toqué reset y perdí todo"</h3>
+  <p>El botón reset borra todo <b>sin posibilidad de deshacer</b>. Recuperá desde tu último backup. Si no tenés backup… no hay forma de recuperar.</p>
+
+  <div class="box box-danger">
+    <div class="ico">🚨</div>
+    <div><b>Regla de oro:</b> hacé backup <b>al menos una vez por semana</b>. Guardá los archivos en un pendrive o en la nube (Google Drive, Dropbox, etc.).</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="contacto">
+  <h2><span class="num">31</span>Contacto y soporte</h2>
+  <p class="sec-sub">Cómo obtener ayuda</p>
+
+  <div class="box box-info">
+    <div class="ico">👤</div>
+    <div>
+      <b>HDSystem IT</b><br>
+      📞 +54 9 11 4563-0851<br>
+      📧 Contacto vía teléfono<br>
+      🌎 Argentina
+    </div>
+  </div>
+
+  <h3>💡 Antes de consultar</h3>
+  <ol>
+    <li>Revisá este manual (probablemente tu pregunta está acá)</li>
+    <li>Ejecutá <code>TESTS.html</code> para verificar que la app no está rota</li>
+    <li>Andá a <b>⚙️ → 🩺 Diagnóstico de red</b> para verificar conexiones</li>
+    <li>Anotá: qué hacías, qué esperabas, qué pasó, mensaje de error exacto</li>
+  </ol>
+
+  <div class="box box-tip">
+    <div class="ico">📸</div>
+    <div>Si vas a reportar un bug, mandá una <b>captura de pantalla</b> con la consola abierta (<kbd>F12</kbd>). Eso acelera muchísimo el diagnóstico.</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<div style="margin-top:80px;padding-top:30px;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:.82rem;line-height:1.8">
+  <b style="color:var(--accent);font-size:1rem">Discografía v8.0.0</b><br>
+  Manual de uso completo · © 2024-2026 HDSystem IT<br>
+  <b>HDSystem IT</b> · 📞 +54 9 11 4563-0851<br>
+  Todos los derechos reservados.
+</div>
+
+</main>
+
+<button type="button" class="print-fab" onclick="window.print()" title="Imprimir el manual (Ctrl+P)" aria-label="Imprimir el manual">
+  <span class="ico">🖨️</span>
+  <span class="label">Imprimir manual</span>
+</button>
+
+<script>
+/* Marcador activo en la navegación */
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('nav a');
+function updateActive(){
+  const scrollY = window.scrollY + 100;
+  let current = '';
+  sections.forEach(sec => {
+    if (sec.offsetTop <= scrollY) current = sec.id;
+  });
+  navLinks.forEach(link => {
+    link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+  });
+}
+window.addEventListener('scroll', updateActive, { passive: true });
+updateActive();
+</script>
+
+</body>
+</html>

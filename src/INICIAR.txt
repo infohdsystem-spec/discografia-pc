@@ -1,0 +1,9 @@
+💿 Discografía v8.0.0 — HDSystem IT · +54 9 11 4563-0851
+   Almacenamiento: idb
+   Schema version: 6
+   Modo carpeta: browser
+   Protocolo: http:
+   Viewport: ...
+   Categoría inicial: __all__ (Todas)
+[I18N] Idioma: es (es-AR)
+[SW] ✓ Registrado

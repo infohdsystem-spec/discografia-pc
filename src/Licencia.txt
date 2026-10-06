@@ -1,0 +1,14 @@
+
+---
+
+## ✅ Checkpoint Bundle 1a
+
+Copiá estos 2 archivos:
+- ✅ `sw.js`
+- ✅ `README.md`
+
+Cuando termines, escribime **`bundle 1b`** y te mando:
+- `index.html` (completo v8.0.0)
+- `styles.css` (completo v8.0.0)
+
+Después seguimos con **`bundle 2`**, **`bundle 3`** y **`bundle 4`**.

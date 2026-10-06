@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Discografía v8.0.0 — Tests</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Segoe UI',Roboto,sans-serif;background:#0e1116;color:#e6ebf2;padding:24px;line-height:1.5}
+  h1{margin:0 0 6px;font-size:1.4rem;display:flex;align-items:center;gap:10px}
+  .sub{color:#8b97a8;font-size:.85rem;margin-bottom:20px}
+  .summary{display:flex;gap:12px;flex-wrap:wrap;padding:16px;background:#151a22;border:1px solid #252d3a;border-radius:12px;margin-bottom:20px}
+  .sum-item{padding:10px 16px;background:#1c232e;border-radius:8px;text-align:center;min-width:110px}
+  .sum-item b{display:block;font-size:1.6rem;font-variant-numeric:tabular-nums}
+  .sum-item span{font-size:.65rem;text-transform:uppercase;letter-spacing:1px;color:#8b97a8}
+  .sum-item.ok b{color:#5ddc9a}
+  .sum-item.err b{color:#ff6b6b}
+  .sum-item.total b{color:#4fc3f7}
+  .suite{margin-bottom:20px;border:1px solid #252d3a;border-radius:10px;overflow:hidden;background:#151a22}
+  .suite-head{padding:12px 16px;background:linear-gradient(180deg,rgba(79,195,247,.08),transparent);border-bottom:1px solid #252d3a;font-weight:700;font-size:.9rem;display:flex;justify-content:space-between;align-items:center}
+  .suite-head .badge{font-size:.7rem;padding:3px 10px;border-radius:12px;background:rgba(93,220,154,.15);color:#5ddc9a;font-weight:700}
+  .suite-head .badge.err{background:rgba(255,107,107,.15);color:#ff6b6b}
+  .test{padding:10px 16px;border-bottom:1px solid rgba(37,45,58,.5);display:flex;gap:12px;align-items:flex-start;font-size:.85rem}
+  .test:last-child{border-bottom:none}
+  .test .icon{flex:0 0 auto;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800}
+  .test.pass .icon{background:rgba(93,220,154,.2);color:#5ddc9a}
+  .test.fail .icon{background:rgba(255,107,107,.2);color:#ff6b6b}
+  .test .body{flex:1;min-width:0}
+  .test .name{color:#e6ebf2}
+  .test .error{color:#ffb3b3;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.78rem;margin-top:6px;padding:8px 10px;background:rgba(255,107,107,.08);border-left:3px solid #ff6b6b;border-radius:6px;white-space:pre-wrap;word-break:break-word}
+  .footer{padding:16px;text-align:center;color:#8b97a8;font-size:.75rem}
+</style>
+</head>
+<body>
+<h1>🧪 Discografía v8.0.0 — Suite de tests</h1>
+<div class="sub" id="subtitle">Cargando…</div>
+<div id="summary" class="summary"></div>
+<div id="results"></div>
+<div class="footer" id="footer">Ejecutando…</div>
+
+<script>
+const _suites = [];
+let _currentSuite = null;
+
+function describe(name, fn){
+  _currentSuite = { name, tests: [] };
+  _suites.push(_currentSuite);
+  fn();
+  _currentSuite = null;
+}
+function it(name, fn){
+  if (!_currentSuite) throw new Error('it() fuera de describe()');
+  _currentSuite.tests.push({ name, fn });
+}
+function expect(actual){
+  return {
+    toBe(expected){ if (actual !== expected) throw new Error(`Esperado: ${JSON.stringify(expected)}\nRecibido: ${JSON.stringify(actual)}`); },
+    toBeNull(){ if (actual !== null) throw new Error(`Esperado: null\nRecibido: ${JSON.stringify(actual)}`); },
+    toBeUndefined(){ if (actual !== undefined) throw new Error(`Esperado: undefined\nRecibido: ${JSON.stringify(actual)}`); },
+    toBeGreaterThan(n){ if (!(actual > n)) throw new Error(`Esperado: > ${n}\nRecibido: ${JSON.stringify(actual)}`); },
+    toBeGreaterThanOrEqual(n){ if (!(actual >= n)) throw new Error(`Esperado: >= ${n}\nRecibido: ${JSON.stringify(actual)}`); },
+    toBeLessThan(n){ if (!(actual < n)) throw new Error(`Esperado: < ${n}\nRecibido: ${JSON.stringify(actual)}`); },
+    toBeLessThanOrEqual(n){ if (!(actual <= n)) throw new Error(`Esperado: <= ${n}\nRecibido: ${JSON.stringify(actual)}`); },
+    toEqual(expected){ const a = JSON.stringify(actual), b = JSON.stringify(expected); if (a !== b) throw new Error(`Esperado: ${b}\nRecibido: ${a}`); },
+    toBeTruthy(){ if (!actual) throw new Error(`Esperado truthy\nRecibido: ${JSON.stringify(actual)}`); }
+  };
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   FUNCIONES BAJO TEST (copia de src/pure.js)
+   ═══════════════════════════════════════════════════════════════════ */
+const ALLOWED_STREAM_DOMAINS = ['open.spotify.com','music.youtube.com','youtube.com','youtu.be','music.apple.com','itunes.apple.com','discogs.com','last.fm','www.last.fm'];
+const SCHEMA_VERSION = 6;
+const TAG_MAX_PER_CD = 12;
+const TAG_MAX_LENGTH = 30;
+const WORKSPACE_COLORS = ['#4fc3f7','#a78bfa','#ffca28','#5ddc9a','#ff6b6b','#ffa94d','#f472b6','#34d399','#60a5fa','#fbbf24','#c084fc','#f87171'];
+const MERGEABLE_FIELDS = [
+  { key: 'titulo', label: 'Título' }, { key: 'interprete', label: 'Intérprete' }, { key: 'anio', label: 'Año álbum' },
+  { key: 'anioEdicion', label: 'Año edición' }, { key: 'formato', label: 'Formato' }, { key: 'estado', label: 'Estado' },
+  { key: 'estadoDisco', label: 'Estado disco' }, { key: 'estadoCaja', label: 'Estado caja' }, { key: 'sello', label: 'Sello' },
+  { key: 'genero', label: 'Género' }, { key: 'catalogo', label: 'Nº catálogo' }, { key: 'codigo', label: 'Código de barras' },
+  { key: 'isrc', label: 'ISRC' }, { key: 'edicion', label: 'Edición' }, { key: 'pais', label: 'País' },
+  { key: 'ubicacion', label: 'Ubicación' }, { key: 'valor', label: 'Valor' }, { key: 'moneda', label: 'Moneda' },
+  { key: 'notas', label: 'Notas' }, { key: 'portada', label: 'Portada' }, { key: 'prestadoA', label: 'Prestado a' }
+];
+
+const norm = s => String(s ?? '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const upper = v => (v === null || v === undefined) ? "" : String(v).toUpperCase();
+const normMatch = s => String(s||'').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g," ").trim();
+
+function stripParenthetical(s){ return String(s||'').replace(/\([^)]*\)/g, ' ').replace(/\[[^\]]*\]/g, ' ').replace(/\s+/g, ' ').trim(); }
+function levenshtein(a, b){
+  const m = a.length, n = b.length;
+  if (!m) return n; if (!n) return m;
+  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1));
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1] : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+  return dp[m][n];
+}
+function stripArticles(s){ return String(s||'').replace(/^(the|a|an|el|la|los|las|un|una)\s+/i,'').replace(/\s+(the|a|an|el|la|los|las|un|una)$/i,'').trim(); }
+function similarity(a, b){
+  const x = normMatch(stripArticles(a)), y = normMatch(stripArticles(b));
+  if (!x || !y) return 0;
+  if (x === y) return 1;
+  if (x.includes(y) || y.includes(x)) return 0.9;
+  const A = new Set(x.split(' ')), B = new Set(y.split(' '));
+  const inter = [...A].filter(v => B.has(v)).length;
+  const union = new Set([...A, ...B]).size;
+  const j = union ? inter / union : 0;
+  const lev = 1 - levenshtein(x, y) / Math.max(x.length, y.length);
+  return Math.max(j, lev * 0.9);
+}
+function matchConfidence(t, i, cand){ return Math.round((similarity(t, cand.title) * 0.6 + similarity(i, cand.artist) * 0.4) * 100); }
+function esSoloOrtografia(a, b){
+  const A = String(a||'').trim(), B = String(b||'').trim();
+  if (!A || !B) return false;
+  const an = normMatch(A), bn = normMatch(B);
+  if (an === bn) return true;
+  const ap = normMatch(stripParenthetical(A));
+  const bp = normMatch(stripParenthetical(B));
+  if (ap && bp && ap === bp) return true;
+  const wa = an.split(' ').filter(Boolean);
+  const wb = bn.split(' ').filter(Boolean);
+  if (wa.length === wb.length && wa.length > 0){
+    let sameCount = 0;
+    for (let i = 0; i < wa.length; i++){
+      if (wa[i] === wb[i]){ sameCount++; continue; }
+      const wLev = levenshtein(wa[i], wb[i]);
+      const maxLen = Math.max(wa[i].length, wb[i].length);
+      if (maxLen > 0 && wLev / maxLen <= 0.35) sameCount++;
+    }
+    if (sameCount === wa.length) return true;
+  }
+  const sim = similarity(A, B);
+  const lenDiff = Math.abs(A.length - B.length);
+  if (sim >= 0.90 && lenDiff <= 3) return true;
+  return false;
+}
+function corregirCampo(valorActual, valorAPI, confianza, replace, umbralMin = 85){
+  const cur = String(valorActual || '').trim();
+  const api = String(valorAPI  || '').trim();
+  if (!api) return null;
+  if (Number(confianza) < umbralMin) return null;
+  if (cur === api) return null;
+  if (!cur) return api;
+  if (esSoloOrtografia(cur, api)) return api;
+  if (replace) return api;
+  return null;
+}
+function isSafeImageUrl(url){
+  if (!url || typeof url !== 'string') return false;
+  if (/^https?:\/\//i.test(url)) return true;
+  if (/^data:image\/(png|jpe?g|gif|webp|svg\+xml);/i.test(url)) return true;
+  if (/^blob:/i.test(url)) return true;
+  return false;
+}
+function isSafeStreamUrl(url){
+  if (!url || typeof url !== 'string') return false;
+  if (!/^https:\/\//i.test(url)) return false;
+  try { const u = new URL(url); const host = u.hostname.toLowerCase(); return ALLOWED_STREAM_DOMAINS.some(d => host === d || host.endsWith('.' + d)); } catch(e){ return false; }
+}
+function isAlbumUrl(url, svcKey){
+  if (!url) return false;
+  try { const u = new URL(url); const path = u.pathname.toLowerCase() + u.search.toLowerCase();
+    switch(svcKey){
+      case 'spotify': return path.includes('/album/') && !path.includes('/track/') && !path.includes('/playlist/');
+      case 'apple': return path.includes('/album/');
+      case 'youtube': return path.includes('olak5uy') || path.includes('/browse/') || path.includes('/playlist');
+      case 'discogs': return path.includes('/release/') || path.includes('/master/');
+      case 'lastfm': return path.includes('/music/') || path.includes('/album/');
+      default: return true;
+    }
+  } catch(e){ return false; }
+}
+function detectDelimiter(t){ const f = String(t).split(/\r?\n/)[0] || ""; return (f.match(/;/g) || []).length >= (f.match(/,/g) || []).length ? ";" : ","; }
+function parseCSV(text, delim){
+  const d = delim || detectDelimiter(text);
+  const rows = []; let row = [], cur = "", inQ = false;
+  for (let i = 0; i < text.length; i++){
+    const c = text[i], n = text[i+1];
+    if (inQ){ if (c === '"' && n === '"'){ cur += '"'; i++; } else if (c === '"') inQ = false; else cur += c; }
+    else { if (c === '"') inQ = true; else if (c === d){ row.push(cur); cur = ""; } else if (c === '\n'){ row.push(cur); rows.push(row); row = []; cur = ""; } else if (c === '\r'){} else cur += c; }
+  }
+  if (cur !== "" || row.length){ row.push(cur); rows.push(row); }
+  return rows.filter(r => r.some(c => c.trim() !== ""));
+}
+function normalizeYear(y){
+  if (y === null || y === undefined || y === '') return null;
+  const n = parseInt(String(y).slice(0, 4), 10);
+  if (!Number.isFinite(n)) return null;
+  if (n < 1900 || n > 2100) return null;
+  return n;
+}
+function limpiarTituloParaBusqueda(titulo){
+  let t = String(titulo || '').trim();
+  if (!t) return '';
+  t = t.replace(/[*#]+/g, ' ');
+  t = t.replace(/\.{2,}/g, ' ');
+  const parts = t.split(/\s*\/\s*/);
+  if (parts.length === 2 && normMatch(parts[0]) === normMatch(parts[1])) t = parts[0];
+  t = t.replace(/\s*\(\s*(en\s+vivo|live)\s*\)\s*$/i, '').trim();
+  t = t.replace(/\s+(CD|VOL|VOLUMEN|PARTE|DISC|DISCO)\s*#?\s*\d+\s*$/i, '').trim();
+  t = t.replace(/\s+GIRA\s+/i, ' ').trim();
+  t = t.replace(/\s+([AB])\s*$/i, (m) => { const sinLado = t.replace(/\s+([AB])\s*$/i, '').trim(); return sinLado.length >= 5 ? '' : m; }).trim();
+  return t.replace(/\s+/g, ' ').trim();
+}
+
+const MIGRATIONS = [
+  { from: 1, to: 2, name: 'Categorías planas → objeto con metadatos',
+    fn: d => { if (!d || typeof d !== 'object') return d; if (Array.isArray(d.categories)){ const obj = {}; for (const c of d.categories){ const key = String(c.key || c.label || ('cat_' + Math.random().toString(36).slice(2, 8))).toLowerCase(); obj[key] = { label: c.label || key, icon: c.icon || '📀', subcategories: [], cds: Array.isArray(c.cds) ? c.cds : [] }; } d.categories = obj; } return d; } },
+  { from: 4, to: 5, name: 'Aplanar estructura de CDs + normalizar campos',
+    fn: d => { if (!d || typeof d !== 'object' || !d.categories) return d; for (const k in d.categories){ const cat = d.categories[k]; if (!cat || !Array.isArray(cat.cds)) continue; cat.cds = cat.cds.map(cd => { if (!cd || typeof cd !== 'object') return cd; if (!cd.id) cd.id = (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'cd_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2)); if (!cd.links || typeof cd.links !== 'object' || Array.isArray(cd.links)) cd.links = {}; if (!cd.customFields || typeof cd.customFields !== 'object') cd.customFields = {}; if (!cd.provenance || typeof cd.provenance !== 'object') cd.provenance = {}; if (cd.subcat === undefined) cd.subcat = null; return cd; }); if (!Array.isArray(cat.subcategories)) cat.subcategories = []; } return d; } },
+  { from: 5, to: 6, name: 'Normalizar prefs + agregar flagged de migración',
+    fn: d => { if (!d || typeof d !== 'object') return d; const defaults = { enrich: true, autoBackup: true, replaceOnEnrich: true }; d.prefs = Object.assign({}, defaults, d.prefs || {}); if (d.seeded === undefined) d.seeded = true; return d; } }
+];
+function migrateBackup(raw, fromVersion, migrations = MIGRATIONS){
+  if (!raw || typeof raw !== 'object') return { data: raw, applied: [] };
+  const current = Number(fromVersion) || 1;
+  if (current >= SCHEMA_VERSION) return { data: raw, applied: [] };
+  let data = JSON.parse(JSON.stringify(raw));
+  const applied = [];
+  for (const m of migrations){
+    if (m.from >= current && m.from < SCHEMA_VERSION){
+      try { const next = m.fn(data); if (next && typeof next === 'object') data = next; applied.push({ from: m.from, to: m.to, name: m.name }); }
+      catch(e){ console.warn(`[migrateBackup] Migración ${m.from} → ${m.to} falló:`, e); }
+    }
+  }
+  data.version = SCHEMA_VERSION;
+  return { data, applied };
+}
+function computeVirtualRange(total, rowHeight, viewportHeight, scrollTop, buffer = 6){
+  if (total <= 0) return { start: 0, end: 0, topPad: 0, bottomPad: 0 };
+  if (!Number.isFinite(rowHeight) || rowHeight <= 0) rowHeight = 1;
+  if (!Number.isFinite(viewportHeight) || viewportHeight < 0) viewportHeight = 0;
+  if (!Number.isFinite(scrollTop) || scrollTop < 0) scrollTop = 0;
+  if (!Number.isFinite(buffer) || buffer < 0) buffer = 0;
+  const first = Math.floor(scrollTop / rowHeight);
+  const visible = Math.ceil(viewportHeight / rowHeight);
+  const start = Math.max(0, first - buffer);
+  const end = Math.min(total, first + visible + buffer);
+  const topPad = start * rowHeight;
+  const bottomPad = Math.max(0, (total - end) * rowHeight);
+  return { start, end, topPad, bottomPad };
+}
+function createLimiter(concurrency){
+  const max = Math.max(1, parseInt(concurrency) || 1);
+  let active = 0;
+  const queue = [];
+  function next(){
+    if (active >= max || queue.length === 0) return;
+    active++;
+    const { fn, resolve, reject } = queue.shift();
+    Promise.resolve().then(() => fn()).then(v => { active--; resolve(v); next(); }, e => { active--; reject(e); next(); });
+  }
+  return function limit(fn){ return new Promise((resolve, reject) => { queue.push({ fn, resolve, reject }); next(); }); };
+}
+function mergeCDs(a, b, choices = {}){
+  if (!a && !b) return null;
+  if (!a) return { ...b };
+  if (!b) return { ...a };
+  const merged = { ...a };
+  for (const f of MERGEABLE_FIELDS){ if (choices[f.key] === 'b') merged[f.key] = b[f.key]; }
+  merged.links = { ...(b.links || {}), ...(a.links || {}) };
+  merged.customFields = { ...(b.customFields || {}), ...(a.customFields || {}) };
+  merged.provenance = { ...(b.provenance || {}), ...(a.provenance || {}) };
+  merged.tags = [...new Set([...(a.tags || []), ...(b.tags || [])])].slice(0, 12);
+  const confA = Number(a.enrichmentConfidence) || 0;
+  const confB = Number(b.enrichmentConfidence) || 0;
+  if (confB > confA){
+    merged.enrichmentSource = b.enrichmentSource || merged.enrichmentSource;
+    merged.enrichmentConfidence = b.enrichmentConfidence || merged.enrichmentConfidence;
+    merged.enrichedAt = b.enrichedAt || merged.enrichedAt;
+  }
+  merged.mbId = a.mbId || b.mbId || null;
+  merged.discogsId = a.discogsId || b.discogsId || null;
+  merged.id = a.id;
+  merged.nro = a.nro;
+  return merged;
+}
+function chunk(arr, n){
+  if (!Array.isArray(arr) || arr.length === 0) return [];
+  const size = Math.max(1, parseInt(n) || 1);
+  const out = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
+}
+function qrPayload(cd, mode = 'url', baseUrl = ''){
+  if (!cd) return '';
+  if (mode === 'url'){
+    const u = String(baseUrl || 'http://localhost').replace(/[#?].*$/, '');
+    const params = new URLSearchParams();
+    if (cd.id) params.set('cd', cd.id);
+    if (cd.nro) params.set('n', String(cd.nro));
+    if (cd.categoria) params.set('c', cd.categoria);
+    return `${u}#open?${params.toString()}`;
+  }
+  const lines = [];
+  if (cd.titulo) lines.push(`Título: ${cd.titulo}`);
+  if (cd.interprete) lines.push(`Intérprete: ${cd.interprete}`);
+  if (cd.anio) lines.push(`Año: ${cd.anio}`);
+  if (cd.nro) lines.push(`Nº: ${cd.nro}`);
+  if (cd.sello) lines.push(`Sello: ${cd.sello}`);
+  if (cd.catalogo) lines.push(`Catálogo: ${cd.catalogo}`);
+  return lines.join('\n');
+}
+function formatLabelData(cd, fields = {}){
+  const title = String(cd?.titulo || '').trim();
+  const lines = [];
+  const l1 = [];
+  if (fields.interprete && cd?.interprete) l1.push(cd.interprete);
+  if (fields.anio && cd?.anio) l1.push(String(cd.anio));
+  if (l1.length) lines.push(l1.join(' · '));
+  const l2 = [];
+  if (fields.nro && cd?.nro) l2.push(`Nº ${cd.nro}`);
+  if (fields.categoria && cd?.categoria) l2.push(String(cd.categoria).toUpperCase());
+  if (fields.sello && cd?.sello) l2.push(String(cd.sello).toUpperCase());
+  if (l2.length) lines.push(l2.join(' · '));
+  if (fields.ubicacion && cd?.ubicacion) lines.push(`📍 ${cd.ubicacion}`);
+  return { title, lines };
+}
+function pagesNeeded(count, fmt){
+  const perPage = Math.max(1, (fmt.cols || 1) * (fmt.rows || 1));
+  return Math.max(1, Math.ceil((count || 0) / perPage));
+}
+function format(str, params = {}){
+  if (!params || typeof params !== 'object') return String(str);
+  return String(str).replace(/\{(\w+)\}/g, (m, k) => (k in params) ? String(params[k]) : m);
+}
+function translate(dict, lang, key, params = {}){
+  if (!dict || typeof dict !== 'object') return key;
+  const current = dict[lang] || {};
+  const fallback = dict.es || {};
+  let str = current[key];
+  if (str === undefined) str = fallback[key];
+  if (str === undefined) return key;
+  return format(str, params);
+}
+function formatNumberWith(n, locale = 'es-AR', decimals = 0){
+  const num = Number(n);
+  if (!Number.isFinite(num)) return '—';
+  try { return new Intl.NumberFormat(locale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(num); }
+  catch(e){ return String(num); }
+}
+function formatCurrencyWith(n, currency, locale = 'es-AR'){
+  const num = Number(n);
+  if (!Number.isFinite(num)) return '—';
+  try { return new Intl.NumberFormat(locale, { style: 'currency', currency: String(currency || 'ARS').toUpperCase(), maximumFractionDigits: 0 }).format(num); }
+  catch(e){ try { return new Intl.NumberFormat(locale, { style: 'decimal', maximumFractionDigits: 0 }).format(num) + ' ' + currency; } catch(e2){ return `${num} ${currency}`; } }
+}
+function formatDateWith(d, locale = 'es-AR', style = 'short'){
+  let dt;
+  if (d instanceof Date) dt = d;
+  else if (typeof d === 'number') dt = new Date(d);
+  else if (typeof d === 'string' && d) dt = new Date(d);
+  else return '';
+  if (isNaN(dt.getTime())) return '';
+  const map = { short: { dateStyle: 'short' }, medium: { dateStyle: 'medium' }, long: { dateStyle: 'long' }, numeric: { year: 'numeric', month: '2-digit', day: '2-digit' } };
+  try { return new Intl.DateTimeFormat(locale, map[style] || map.short).format(dt); } catch(e){ return dt.toLocaleDateString(); }
+}
+function formatPercentWith(n, locale = 'es-AR', decimals = 0){
+  const num = Number(n);
+  if (!Number.isFinite(num)) return '—';
+  try { return new Intl.NumberFormat(locale, { style: 'percent', minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(num); }
+  catch(e){ return `${(num * 100).toFixed(decimals)}%`; }
+}
+function workspaceSlugify(name){
+  return String(name || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 32) || ('ws_' + Date.now().toString(36));
+}
+function generateWorkspaceId(name, existing = []){
+  const base = workspaceSlugify(name);
+  const ids = new Set((existing || []).map(w => w.id));
+  if (!ids.has(base)) return base;
+  let i = 2;
+  while (ids.has(base + '_' + i)) i++;
+  return base + '_' + i;
+}
+function validateWorkspaceName(name, existing = [], currentId = null){
+  const clean = String(name || '').trim();
+  if (!clean) return { ok: false, error: 'name_empty' };
+  if (clean.length > 40) return { ok: false, error: 'name_too_long' };
+  const lower = clean.toLowerCase();
+  const dup = (existing || []).find(w => w.id !== currentId && String(w.name || '').toLowerCase() === lower);
+  if (dup) return { ok: false, error: 'name_duplicated' };
+  return { ok: true };
+}
+function workspaceColorFromSeed(seed){
+  const s = String(seed || '');
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return WORKSPACE_COLORS[Math.abs(h) % WORKSPACE_COLORS.length];
+}
+function isSafeWorkspaceId(id){ return typeof id === 'string' && /^[a-z0-9_]{1,40}$/.test(id); }
+function normalizeTag(t){
+  return String(t || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s_-]/g, '').replace(/\s+/g, '_').replace(/_+/g, '_').replace(/^_+|_+$/g, '').slice(0, TAG_MAX_LENGTH);
+}
+function parseTags(str){
+  if (!str) return [];
+  return [...new Set(String(str).split(/[,\n]/).map(normalizeTag).filter(Boolean))].slice(0, TAG_MAX_PER_CD);
+}
+function tagMatches(cdTags, query){
+  const tags = Array.isArray(cdTags) ? cdTags : [];
+  const wanted = String(query || '').toLowerCase().split(/[,\s]+/).filter(Boolean);
+  if (!wanted.length) return true;
+  return wanted.every(w => tags.some(t => t.includes(w)));
+}
+function tagColorFromSeed(tag, palette){
+  const colors = Array.isArray(palette) && palette.length ? palette : ['#4fc3f7'];
+  const s = String(tag || '');
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return colors[Math.abs(h) % colors.length];
+}
+function fuzzyScore(text, query){
+  const t = String(text || '').toLowerCase();
+  const q = String(query || '').toLowerCase().trim();
+  if (!q) return 0;
+  if (t === q) return 1000;
+  if (t.startsWith(q)) return 500;
+  if (t.includes(q)) return 250;
+  let ti = 0, qi = 0, score = 0;
+  while (ti < t.length && qi < q.length){
+    if (t[ti] === q[qi]){ qi++; score += 1; }
+    ti++;
+  }
+  if (qi === q.length) return score;
+  return -1;
+}
+function normalizeSavedFilter(obj){
+  if (!obj || typeof obj !== 'object') return null;
+  const name = String(obj.name || '').trim().slice(0, 40);
+  if (!name) return null;
+  return {
+    id: obj.id || ('sf_' + Date.now().toString(36)),
+    name,
+    icon: String(obj.icon || '⭐').slice(0, 4),
+    createdAt: obj.createdAt || new Date().toISOString(),
+    filters: {
+      q: String(obj.filters?.q || '').slice(0, 200),
+      artista: String(obj.filters?.artista || '').slice(0, 120),
+      subcat: String(obj.filters?.subcat || '').slice(0, 40),
+      tagFilter: String(obj.filters?.tagFilter || '').slice(0, 30),
+      cat: String(obj.filters?.cat || '').slice(0, 40),
+      sortKey: String(obj.filters?.sortKey || 'nro').slice(0, 20),
+      sortDir: (obj.filters?.sortDir === -1) ? -1 : 1,
+      view: (obj.filters?.view === 'dashboard') ? 'dashboard' : 'table',
+      estado: String(obj.filters?.estado || ''),
+      formato: String(obj.filters?.formato || ''),
+      anioDesde: String(obj.filters?.anioDesde || ''),
+      anioHasta: String(obj.filters?.anioHasta || ''),
+      ubicacion: String(obj.filters?.ubicacion || ''),
+      portada: String(obj.filters?.portada || ''),
+      prestamo: String(obj.filters?.prestamo || '')
+    }
+  };
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TESTS
+   ═══════════════════════════════════════════════════════════════════ */
+
+describe('norm / upper / normMatch', () => {
+  it('normaliza acentos', () => { expect(normMatch('Café Tacuba')).toBe('cafe tacuba'); });
+  it('norm NFD', () => { expect(norm('AñO')).toBe('ano'); });
+  it('upper null → vacío', () => { expect(upper(null)).toBe(''); });
+});
+
+describe('levenshtein / similarity / matchConfidence', () => {
+  it('levenshtein', () => { expect(levenshtein('kitten', 'sitting')).toBe(3); });
+  it('similarity 1', () => { expect(similarity('Pink Floyd', 'pink floyd')).toBe(1); });
+  it('similarity bajo', () => { expect(similarity('Pink Floyd', 'Led Zeppelin')).toBeLessThan(0.4); });
+  it('matchConfidence 100', () => { expect(matchConfidence('The Wall', 'Pink Floyd', { title: 'The Wall', artist: 'Pink Floyd' })).toBe(100); });
+});
+
+describe('esSoloOrtografia / corregirCampo', () => {
+  it('typo', () => { expect(esSoloOrtografia('Soda Estereo', 'Soda Stereo')).toBe(true); });
+  it('distintos → false', () => { expect(esSoloOrtografia('Pink Floyd', 'Led Zeppelin')).toBe(false); });
+  it('corrige si umbral OK', () => { expect(corregirCampo('THE WALL', 'The Wall', 90, true)).toBe('The Wall'); });
+  it('no corrige si umbral bajo', () => { expect(corregirCampo('THE WALL', 'The Wall', 50, true)).toBeNull(); });
+});
+
+describe('isSafeImageUrl / isSafeStreamUrl / isAlbumUrl', () => {
+  it('imagen https', () => { expect(isSafeImageUrl('https://x.com/a.jpg')).toBe(true); });
+  it('imagen javascript → false', () => { expect(isSafeImageUrl('javascript:alert(1)')).toBe(false); });
+  it('stream spotify', () => { expect(isSafeStreamUrl('https://open.spotify.com/album/abc')).toBe(true); });
+  it('stream evil → false', () => { expect(isSafeStreamUrl('https://evil.com/track')).toBe(false); });
+  it('álbum vs track', () => {
+    expect(isAlbumUrl('https://open.spotify.com/album/abc', 'spotify')).toBe(true);
+    expect(isAlbumUrl('https://open.spotify.com/track/abc', 'spotify')).toBe(false);
+  });
+});
+
+describe('parseCSV / normalizeYear / limpiarTitulo', () => {
+  it('CSV comillas', () => { expect(parseCSV('a;b\n"con ""comillas""";x\n')[1][0]).toBe('con "comillas"'); });
+  it('normalizeYear', () => { expect(normalizeYear('1969')).toBe(1969); expect(normalizeYear('1850')).toBeNull(); });
+  it('limpiar (Live)', () => { expect(limpiarTituloParaBusqueda('Album (Live)')).toBe('Album'); });
+  it('limpiar CD 2', () => { expect(limpiarTituloParaBusqueda('Album CD 2')).toBe('Album'); });
+});
+
+describe('migrateBackup', () => {
+  it('null → null', () => { expect(migrateBackup(null, 1).data).toBeNull(); });
+  it('al día → sin migrar', () => { expect(migrateBackup({ version: SCHEMA_VERSION, categories: {} }, SCHEMA_VERSION, MIGRATIONS).applied.length).toBe(0); });
+  it('v1 completa', () => {
+    const { data, applied } = migrateBackup({ version: 1, categories: [{ label: 'X', cds: [] }] }, 1, MIGRATIONS);
+    expect(applied.length).toBe(3);
+    expect(data.version).toBe(SCHEMA_VERSION);
+  });
+});
+
+describe('computeVirtualRange', () => {
+  it('vacío', () => { expect(computeVirtualRange(0, 70, 700, 0, 6).end).toBe(0); });
+  it('sin scroll', () => {
+    const r = computeVirtualRange(100, 70, 700, 0, 6);
+    expect(r.start).toBe(0); expect(r.end).toBe(16);
+  });
+  it('mitad', () => {
+    const r = computeVirtualRange(100, 70, 700, 3500, 6);
+    expect(r.start).toBe(44); expect(r.end).toBe(66);
+  });
+  it('invariante', () => {
+    const r = computeVirtualRange(250, 60, 800, 4200, 6);
+    const rendered = (r.end - r.start) * 60;
+    expect(r.topPad + rendered + r.bottomPad).toBe(250 * 60);
+  });
+});
+
+describe('createLimiter', () => {
+  it('respeta concurrencia', async () => {
+    const limit = createLimiter(2);
+    let active = 0, maxActive = 0;
+    await Promise.all(Array.from({ length: 10 }, () => limit(async () => {
+      active++; maxActive = Math.max(maxActive, active);
+      await new Promise(r => setTimeout(r, 5));
+      active--;
+    })));
+    expect(maxActive).toBeLessThanOrEqual(2);
+  });
+  it('propaga errores', async () => {
+    const limit = createLimiter(2);
+    const res = await Promise.allSettled([limit(() => Promise.resolve('ok')), limit(() => Promise.reject(new Error('boom')))]);
+    expect(res[0].status).toBe('fulfilled');
+    expect(res[1].status).toBe('rejected');
+  });
+});
+
+describe('mergeCDs', () => {
+  it('null+null', () => { expect(mergeCDs(null, null)).toBeNull(); });
+  it('choices b', () => {
+    const r = mergeCDs({ id: 'a', titulo: 'A', interprete: 'X' }, { id: 'b', titulo: 'B', interprete: 'Y' }, { titulo: 'b' });
+    expect(r.titulo).toBe('B');
+    expect(r.interprete).toBe('X');
+  });
+  it('conserva id/nro', () => {
+    const r = mergeCDs({ id: 'a1', nro: 10 }, { id: 'b1', nro: 20 });
+    expect(r.id).toBe('a1'); expect(r.nro).toBe(10);
+  });
+  it('une links', () => {
+    const r = mergeCDs({ id: 'a1', links: { spotify: 'A' } }, { id: 'b1', links: { spotify: 'B', apple: 'C' } });
+    expect(r.links.spotify).toBe('A');
+    expect(r.links.apple).toBe('C');
+  });
+  it('une tags sin duplicados', () => {
+    const r = mergeCDs({ id: 'a1', tags: ['rock'] }, { id: 'b1', tags: ['pop', 'rock'] });
+    expect(r.tags).toEqual(['rock', 'pop']);
+  });
+});
+
+describe('chunk / qrPayload / formatLabelData / pagesNeeded', () => {
+  it('chunk', () => { expect(chunk([1,2,3,4], 2)).toEqual([[1,2],[3,4]]); });
+  it('chunk null', () => { expect(chunk(null, 5)).toEqual([]); });
+  it('qr URL', () => {
+    const p = qrPayload({ id: 'abc', nro: 42 }, 'url', 'http://x.com/');
+    expect(p).toContain('#open?'); expect(p).toContain('cd=abc');
+  });
+  it('qr texto', () => { expect(qrPayload({ titulo: 'X' }, 'text')).toContain('Título: X'); });
+  it('formatLabelData', () => {
+    const r = formatLabelData({ titulo: 'X', interprete: 'A', anio: 1990 }, { interprete: true, anio: true });
+    expect(r.lines[0]).toBe('A · 1990');
+  });
+  it('pagesNeeded', () => { expect(pagesNeeded(25, { cols: 3, rows: 8 })).toBe(2); });
+});
+
+describe('format / translate', () => {
+  it('format simple', () => { expect(format('Hola {name}', { name: 'Juan' })).toBe('Hola Juan'); });
+  it('format deja placeholder', () => { expect(format('Hola {x}', {})).toBe('Hola {x}'); });
+  it('translate directo', () => { expect(translate({ es: { hello: 'Hola' }, en: { hello: 'Hello' } }, 'en', 'hello')).toBe('Hello'); });
+  it('translate fallback', () => { expect(translate({ es: { x: 'Hola' }, en: {} }, 'en', 'x')).toBe('Hola'); });
+  it('translate key', () => { expect(translate({ es: {} }, 'en', 'nope')).toBe('nope'); });
+});
+
+describe('Intl helpers', () => {
+  it('formatNumber en-US', () => { expect(formatNumberWith(1234.5, 'en-US', 1)).toBe('1,234.5'); });
+  it('NaN → —', () => { expect(formatNumberWith(NaN, 'en-US')).toBe('—'); });
+  it('currency USD', () => { expect(formatCurrencyWith(1234, 'USD', 'en-US')).toContain('1,234'); });
+  it('date 2024', () => { expect(formatDateWith(new Date('2024-06-15'), 'en-US')).toContain('2024'); });
+  it('date null → vacío', () => { expect(formatDateWith(null)).toBe(''); });
+  it('percent 0.5', () => { expect(formatPercentWith(0.5, 'en-US')).toContain('50'); });
+});
+
+describe('workspace helpers', () => {
+  it('slugify', () => { expect(workspaceSlugify('Mi Colección')).toBe('mi_coleccion'); });
+  it('slugify símbolos', () => { expect(workspaceSlugify('Jazz & Blues')).toBe('jazz_blues'); });
+  it('generateId', () => { expect(generateWorkspaceId('Rock', [{ id: 'rock' }])).toBe('rock_2'); });
+  it('validate vacío', () => { expect(validateWorkspaceName('').error).toBe('name_empty'); });
+  it('validate duplicado', () => { expect(validateWorkspaceName('ROCK', [{ id: 'x', name: 'rock' }]).error).toBe('name_duplicated'); });
+  it('color determinístico', () => { expect(workspaceColorFromSeed('rock')).toBe(workspaceColorFromSeed('rock')); });
+  it('isSafeId', () => { expect(isSafeWorkspaceId('rock')).toBe(true); expect(isSafeWorkspaceId('Rock')).toBe(false); });
+});
+
+describe('tags helpers', () => {
+  it('normalizeTag minúsculas', () => { expect(normalizeTag('ROCK')).toBe('rock'); });
+  it('normalizeTag acentos', () => { expect(normalizeTag('Música')).toBe('musica'); });
+  it('normalizeTag espacios', () => { expect(normalizeTag('para vender')).toBe('para_vender'); });
+  it('normalizeTag truncar', () => { expect(normalizeTag('a'.repeat(50)).length).toBe(TAG_MAX_LENGTH); });
+  it('parseTags dedup', () => { expect(parseTags('rock,rock,pop')).toEqual(['rock','pop']); });
+  it('parseTags normaliza', () => { expect(parseTags('Rock, POP Música')).toEqual(['rock','pop_musica']); });
+  it('tagMatches simple', () => { expect(tagMatches(['rock'], 'rock')).toBe(true); });
+  it('tagMatches substring', () => { expect(tagMatches(['rock_nacional'], 'rock')).toBe(true); });
+  it('tagMatches AND', () => { expect(tagMatches(['rock','pop'], 'rock pop')).toBe(true); });
+  it('tagMatches faltante', () => { expect(tagMatches(['rock'], 'rock pop')).toBe(false); });
+  it('tagColorFromSeed en paleta', () => { const pal = ['#aaa','#bbb']; expect(pal).toContain(tagColorFromSeed('abc', pal)); });
+});
+
+describe('fuzzyScore / normalizeSavedFilter', () => {
+  it('fuzzy exacto 1000', () => { expect(fuzzyScore('Nuevo CD', 'nuevo cd')).toBe(1000); });
+  it('fuzzy startsWith 500', () => { expect(fuzzyScore('Nuevo CD', 'nuevo')).toBe(500); });
+  it('fuzzy includes 250', () => { expect(fuzzyScore('Exportar CSV', 'csv')).toBe(250); });
+  it('fuzzy sin match -1', () => { expect(fuzzyScore('Dashboard', 'xyz')).toBe(-1); });
+  it('fuzzy vacío 0', () => { expect(fuzzyScore('X', '')).toBe(0); });
+  it('savedFilter vacío null', () => { expect(normalizeSavedFilter({ name: '' })).toBeNull(); });
+  it('savedFilter genera id', () => { expect(normalizeSavedFilter({ name: 'x' }).id).toBeTruthy(); });
+  it('savedFilter recorta nombre', () => { expect(normalizeSavedFilter({ name: 'a'.repeat(60) }).name.length).toBe(40); });
+});
+
+/* ═══════════════════════════════════════════════════════════════════
+   RUNNER
+   ═══════════════════════════════════════════════════════════════════ */
+(async function run(){
+  let totalPass = 0, totalFail = 0;
+  const resultsEl = document.getElementById('results');
+  const summaryEl = document.getElementById('summary');
+  const subtitleEl = document.getElementById('subtitle');
+
+  let totalTests = 0;
+  for (const s of _suites) totalTests += s.tests.length;
+  subtitleEl.textContent = `${totalTests} tests · Funciones puras + Migraciones + Virtual + Limiter + Merge + Labels + i18n + Intl + Workspaces + Tags + Fuzzy`;
+
+  for (const suite of _suites){
+    let suitePass = 0, suiteFail = 0;
+    const suiteEl = document.createElement('div');
+    suiteEl.className = 'suite';
+    const headEl = document.createElement('div');
+    headEl.className = 'suite-head';
+    const testsEl = document.createElement('div');
+
+    for (const t of suite.tests){
+      const testEl = document.createElement('div');
+      testEl.className = 'test';
+      try {
+        const result = t.fn();
+        if (result instanceof Promise) await result;
+        testEl.classList.add('pass');
+        testEl.innerHTML = `<span class="icon">✓</span><div class="body"><div class="name">${escapeHTML(t.name)}</div></div>`;
+        suitePass++; totalPass++;
+      } catch(err){
+        testEl.classList.add('fail');
+        testEl.innerHTML = `<span class="icon">✕</span><div class="body"><div class="name">${escapeHTML(t.name)}</div><div class="error">${escapeHTML(err.message)}</div></div>`;
+        suiteFail++; totalFail++;
+      }
+      testsEl.appendChild(testEl);
+    }
+
+    const badge = suiteFail === 0
+      ? `<span class="badge">✓ ${suitePass}/${suite.tests.length}</span>`
+      : `<span class="badge err">✕ ${suiteFail} fallos</span>`;
+    headEl.innerHTML = `<span>${escapeHTML(suite.name)}</span>${badge}`;
+    suiteEl.appendChild(headEl);
+    suiteEl.appendChild(testsEl);
+    resultsEl.appendChild(suiteEl);
+  }
+
+  summaryEl.innerHTML = `
+    <div class="sum-item total"><b>${totalPass + totalFail}</b><span>Total</span></div>
+    <div class="sum-item ok"><b>${totalPass}</b><span>Aprobados</span></div>
+    <div class="sum-item err"><b>${totalFail}</b><span>Fallados</span></div>
+  `;
+
+  const footer = document.getElementById('footer');
+  if (totalFail === 0){
+    footer.innerHTML = `✅ <b style="color:#5ddc9a">Todos los tests pasaron.</b> Discografía v8.0.0 — HDSystem IT`;
+  } else {
+    footer.innerHTML = `❌ <b style="color:#ff6b6b">${totalFail} test(s) fallaron.</b> Revisá el detalle arriba.`;
+  }
+
+  console.log(`%c🧪 Tests: ${totalPass} pass · ${totalFail} fail`, `color:${totalFail===0?'#5ddc9a':'#ff6b6b'};font-weight:bold;font-size:14px`);
+
+  function escapeHTML(s){
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+})();
+</script>
+</body>
+</html>
